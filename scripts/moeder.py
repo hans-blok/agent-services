@@ -11,15 +11,11 @@ Usage:
     python scripts/moeder.py --help
 
 Voor de Moeder agent voert de runner één operatie per run uit:
-    beheer-git | configureer-github | orden-workspace | schrijf-beleid |
+    beheer-git | configureer-github | orden-workspace | schrijf-beleid | 
     zet-agent-boundary | valideer-governance
 
 Traceability:
-- Standaard schrijft de runner een trace artefact weg in temp/.
-- Bij succesvolle operaties met aangepaste artefacten geeft de runner een
-  expliciete herinnering om de wijziging te loggen in de workspace state
-  (`state-<workspace-naam>.md`) conform
-  `artefacten/0-governance/doctrine-workspace-state-en-legitimiteit.md`.
+    Standaard schrijft de runner een trace artefact weg in temp/.
 """
 
 import sys
@@ -38,13 +34,6 @@ def main() -> int:
         print(f"OK: {result.message}")
         if result.trace_path is not None:
             print(f"Trace: {result.trace_path.relative_to(WORKSPACE_ROOT).as_posix()}")
-        # Indien er artefacten zijn aangeraakt, herinner aan loggingplicht in state
-        if getattr(result, "artifacts", None):
-            print(
-                "Let op: log deze wijziging in de workspace state "
-                "(state-<workspace-naam>.md) volgens "
-                "artefacten/0-governance/doctrine-workspace-state-en-legitimiteit.md."
-            )
         return 0
 
     print(f"ERROR: {result.message}", file=sys.stderr)
