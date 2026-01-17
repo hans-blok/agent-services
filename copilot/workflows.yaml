@@ -1,0 +1,16 @@
+workflows:
+  - id: nieuwe-workspace-beleid
+    description: Genereer of update beleid voor een nieuwe workspace.
+    steps:
+      - agent: moeder
+        action: schrijf-beleid
+        input:
+          mode: interactive
+
+  - id: nieuwe-agent-aanmaken
+    description: Definieer boundary en maak rol/prompt/runner voor een nieuwe agent.
+    steps:
+      - agent: moeder
+        action: zet-agent-boundary
+      - agent: agent-smeder
+        action: ontwerp-agent

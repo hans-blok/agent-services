@@ -1,0 +1,70 @@
+# Temporary folder (workspace scratch, build artifacts, cache)
+temp/
+
+# Canon (normative source controlled separately)
+canon/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+.settings/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+*.log
+
+# Dependencies
+node_modules/
+.npm
+
+# Build and coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+dist/
+build/
+
+# Git-related
+.git/
+.gitmodules

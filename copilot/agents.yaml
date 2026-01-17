@@ -1,0 +1,14 @@
+agents:
+  - id: moeder
+    name: workspace.moeder
+    type: technisch
+    role: governance/rolbeschrijvingen/moeder.md
+    charter: governance/charters-agents/charter-moeder.md
+    runner: scripts/moeder.py
+
+  - id: agent-smeder
+    name: workspace.agent-smeder
+    type: technisch
+    role: governance/rolbeschrijvingen/agent-smeder.md
+    charter: governance/charters-agents/charter.agent-smeder.md
+    runner: scripts/agent-smeder.py
