@@ -5,7 +5,7 @@
 **Type**: Governance-agent  
 **Value Stream**: Governance & Orde
 
-**Governance**: Deze agent volgt het beleid vastgelegd in governance-documenten. De agent werkt exclusief binnen scope van canonieke communicatie en respecteert alle richtlijnen uit de constitutie. De Heraut baseert zich op en kondigt de **agent-charter-normering** (canon/grondslagen/globaal/agent-charter-normering.md) aan als bindend normatief kader voor het agent eco-systeem.
+**Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend. De Heraut baseert zich op en kondigt de **agent-charter-normering** (canon/grondslagen/globaal/agent-charter-normering.md) aan als bindend normatief kader voor het agent eco-systeem.
 
 ---
 

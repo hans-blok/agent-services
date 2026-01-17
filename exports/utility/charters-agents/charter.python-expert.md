@@ -1,6 +1,6 @@
 # Charter — python-expert
 
-**Governance**: Deze agent volgt het beleid vastgelegd in [beleid/beleid-workspace.md](beleid/beleid-workspace.md). De agent werkt exclusief binnen de scope van agent-enablement en respects alle richtlijnen uit de constitutie.
+**Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend.
 
 ## 1. Doel van de agent
 
