@@ -183,8 +183,11 @@ def main():
     
     args = parser.parse_args()
     
-    if not args.value_stream:
-        print("❌ value-stream argument is required")
+    # Strip quotes from value_stream argument (DOS/CMD may pass them literally)
+    value_stream = args.value_stream.strip("'\"")
+    
+    if not value_stream:
+        print("[ERROR] value-stream argument is required")
         sys.exit(1)
     
     workspace_root = os.getcwd()
@@ -195,8 +198,8 @@ def main():
             # Clone remote repo
             repo_path = fetch_remote_repo(args.source_repo, temp_dir)
             
-            # Find agents
-            vs_files, util_files = find_agents(repo_path, args.value_stream)
+            # Find agents (use stripped value_stream)
+            vs_files, util_files = find_agents(repo_path, value_stream)
             
             if not vs_files and not util_files:
                 print("[ERROR] No agents found")
