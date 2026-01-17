@@ -13,6 +13,7 @@ De Agent Curator bepaalt agent-boundaries op basis van gewenste capability en va
 **Verplichte parameters**:
 - aanleiding: Waarom is een nieuwe agent nodig? (type: string, 1–3 zinnen)
 - gewenste-capability: Wat moet de agent kunnen? (type: string, 1 zin)
+- value-stream: Voor welke value stream is deze agent bedoeld? (type: string, bijv. 'kennispublicatie', 'it-development', 'utility')
 
 **Optionele parameters**:
 - voorbeelden: 1–3 voorbeelden van typische vragen/opdrachten voor de nieuwe agent (type: string of lijst)
@@ -47,8 +48,9 @@ domein: <één woord of korte frase>
 ### Foutafhandeling
 
 De Agent Curator:
-- Stopt wanneer de aanleiding of gewenste-capability te vaag is om een boundary te formuleren.
+- Stopt wanneer de aanleiding, gewenste-capability of value-stream te vaag is of ontbreekt.
 - Stopt wanneer de nieuwe agent buiten de scope van governance/beleid.md valt.
+- Stopt wanneer de value-stream onbekend is of niet gedefinieerd in governance.
 - Vraagt om verduidelijking bij overlap met bestaande agents (zelfde capability/boundary).
 - Escaleert naar Moeder of governance wanneer fundamentele inconsistenties worden gedetecteerd.
 - Markeert twijfels expliciet: geen impliciete aannames.

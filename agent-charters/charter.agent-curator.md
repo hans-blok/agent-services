@@ -108,6 +108,12 @@ De Curator operateert buiten de standaard SAFe lifecycle; het is een governance-
   - Verplicht: Ja (voor boundary-bepaling)
   - Beschrijving: Waarom is een agent nodig? Wat moet het kunnen?
 
+- **Value Stream Naam**
+  - Type: String
+  - Bron: Gebruiker/Governance
+  - Verplicht: Ja (voor boundary-bepaling)
+  - Beschrijving: Voor welke value stream is deze agent bedoeld (bijv. 'kennispublicatie', 'it-development', 'utility')
+
 - **Bestaande Agent Charters**
   - Type: Markdown (.md)
   - Bron: governance/charters-agents/ en governance/rolbeschrijvingen/
