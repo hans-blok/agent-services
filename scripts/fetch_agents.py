@@ -92,10 +92,10 @@ def _collect_agent_files(base_path: Path) -> List[Path]:
     if prompts_dir.exists():
         files.extend(prompts_dir.glob("*.prompt.md"))
     
-    # Charters: charter.*.md
+    # Charters: charter*.md (both charter.*.md and charter-*.md formats)
     charters_dir = base_path / "charters-agents"
     if charters_dir.exists():
-        files.extend(charters_dir.glob("charter.*.md"))
+        files.extend(charters_dir.glob("charter*.md"))
     
     # Runners: *.py (but not __init__.py or __pycache__)
     runners_dir = base_path / "runners"
