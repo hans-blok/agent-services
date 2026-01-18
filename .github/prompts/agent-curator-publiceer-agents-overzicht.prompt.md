@@ -28,34 +28,43 @@ Bij een geldige opdracht levert de Agent Curator altijd:
 
 **Bij scope='volledig'**:
 - **Volledig agents overzicht** met alle agents uit exports/
-- Kolommen: agent-naam, agent-soort, value stream, domein, prompts (aantal), status
+- Kolommen: Agent | Value Stream | Aantal prompts | Aantal runners
 - Gegroepeerd per value stream
-- Opgeslagen in: `docs/resultaten/agent-curator/agents-publicatie-<datum>.md`
+- Opgeslagen in:
+  - **Root**: `agents-publicatie.md` (publiceerbaar, zonder datum)
+  - **Archief**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (met metadata)
 
 **Bij scope='value-stream'**:
 - **Value stream specifiek overzicht** met alle agents in opgegeven stream
 - Zelfde kolommen als volledig overzicht
 - Alleen agents uit de gespecificeerde value stream
-- Opgeslagen in: `docs/resultaten/agent-curator/agents-publicatie-<value-stream>-<datum>.md`
+- Opgeslagen in: `docs/resultaten/agent-publicaties/agents-publicatie-<value-stream>-<datum>.md`
 
 **Bij scope='agent-soort'**:
 - **Agent-soort specifiek overzicht** met alle agents van opgegeven soort
 - Gegroepeerd per value stream binnen de agent-soort
 - Zelfde kolommen als volledig overzicht
-- Opgeslagen in: `docs/resultaten/agent-curator/agents-publicatie-<agent-soort>-<datum>.md`
+- Opgeslagen in: `docs/resultaten/agent-publicaties/agents-publicatie-<agent-soort>-<datum>.md`
 
-**Algemene output-structuur** (markdown):
-- Samenvatting (totaal aantal agents, aantal per value stream, aantal per agent-soort)
-- Gestructureerde tabel met alle agents
-- Metadata (publicatiedatum, basis-folder, aantal gescande charters)
+**Algemene output-structuur**:
+
+**Root publicatie** (`agents-publicatie.md`):
+- Bondig overzicht volgens template (`templates/agents-publicatie-template.md`)
+- Tabel: Agent | Value Stream | Aantal prompts | Aantal runners
+- Gebruik-sectie met folder-locaties (exports/<value-stream>/{charters-agents/, prompts/, runners/})
+- Geen metadata, geen datum in bestandsnaam
+
+**Archief** (`docs/resultaten/agent-publicaties/`):
+- Volledige versie met metadata (publicatiedatum, gescande folders, aantal charters)
 - Herkomstverantwoording (welke folders gescand, welke charters gelezen)
+- Datum in bestandsnaam voor traceerbaarheid
 
 **Voor fetching vanuit project workspaces**:
 Het overzicht bevat altijd:
 - Unieke agent-naam (identifier voor fetching)
-- Agent-soort (Adviserend Agent | Uitvoerend Agent | Beheeragent)
 - Value Stream (domein/context van de agent)
-- Beschikbare prompts (welke capabilities de agent heeft)
+- Aantal prompts en runners (capabilities van de agent)
+- Folder-locaties (waar artefacten te vinden zijn)
 
 ### Foutafhandeling
 
