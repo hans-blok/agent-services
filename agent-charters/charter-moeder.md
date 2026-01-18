@@ -165,6 +165,14 @@ Bron: `exports/utility/prompts/moeder-fetch-agents.prompt.md`
 - **Logging**: Schrijft fetch-log naar `docs/logs/fetch-agents-<datum>-<tijd>.md` met timestamp, value-stream, branch, geïnstalleerde agents en locaties
 - **Validatie**: Verifieert dat alle artefacten correct geïnstalleerd zijn
 
+**BELANGRIJK - Overschrijfgedrag**:
+Wanneer agents worden gefetched, worden **bestaande artefacten volledig overschreven**:
+- **Charters**: Bestaand charter wordt vervangen door nieuwe versie uit agent-services
+- **Prompts**: Bestaande prompts met dezelfde naam worden overschreven; extra prompts in workspace blijven behouden
+- **Runner module folders**: Bestaande runner module folder (bijv. `scripts/moeder/`) wordt **volledig verwijderd en vervangen**. Als de workspace-folder 2 bestanden bevat en de agent-services folder 1 bestand, blijft na fetch **alleen het 1 bestand uit agent-services** over.
+
+Dit gedrag is **by design**: fetching installeert de canonieke versie uit agent-services. Workspace-specifieke aanpassingen aan gefetchte agents worden overschreven. Voor workspace-specifieke agents (die niet gefetched worden) geldt dit niet.
+
 ## Specialisaties
 
 ### Git Expertise

@@ -2,7 +2,21 @@
 """
 Fetch and organize agents from agent-services using the manifest in repo root.
 Supports Dutch manifest fields (agents-publicatie.json) as provided in agent-services.
+
+BELANGRIJK - Overschrijfgedrag:
+- Charters: Volledig overschreven met versie uit agent-services
+- Prompts: Bestaande prompts met dezelfde naam overschreven; extra prompts behouden
+- Runner module folders: Volledig verwijderd en vervangen (niet gemerged!)
+
+Dit is by design: fetching installeert de canonieke versie uit agent-services.
+Workspace-specifieke aanpassingen worden overschreven.
+
+Usage:
+    python fetch_agents.py kennispublicatie
+    python fetch_agents.py --list
 """
+
+from __future__ import annotations
 
 import argparse
 import json
@@ -114,9 +128,14 @@ def filter_agents(specs: List[AgentSpec], value_stream: str) -> Tuple[List[Agent
     return applicable, skipped
 
 
-def resolve_files(repo_path: Path, specs: List[AgentSpec]) -> Tuple[List[Path], List[Path], List[str]]:
+def resolve_files(repo_path: Path, specs: List[AgentSpec]) -> Tuple[List[Path], List[Path], List[Path], List[str]]:
+    """Resolve agent files. Returns (vs_files, util_files, runner_modules, missing).
+    
+    runner_modules zijn directories die volledig moeten worden overschreven.
+    """
     vs_files: List[Path] = []
     util_files: List[Path] = []
+    runner_modules: List[Path] = []  # Module folders to replace entirely
     missing: List[str] = []
 
     for spec in specs:
@@ -139,12 +158,15 @@ def resolve_files(repo_path: Path, specs: List[AgentSpec]) -> Tuple[List[Path], 
                 if not abs_path.exists():
                     missing.append(f"{spec.name}: file missing {rel}")
                     continue
-                # If runner is a package directory, copy all py inside
-                if abs_path.is_dir():
+                # If runner is a package directory, mark for full replacement
+                if abs_path.is_dir() and "runners" in abs_path.parts:
+                    runner_modules.append(abs_path)
+                elif abs_path.is_dir():
+                    # Non-runner directory, copy all py inside
                     bucket.extend(abs_path.rglob("*.py"))
                 else:
                     bucket.append(abs_path)
-    return vs_files, util_files, missing
+    return vs_files, util_files, runner_modules, missing
 
 
 def _copy_file(src: Path, dest: Path) -> str:
@@ -165,17 +187,47 @@ def _copy_file(src: Path, dest: Path) -> str:
         return "error"
 
 
-def organize(vs_files: List[Path], util_files: List[Path], workspace: Path) -> Dict[str, int]:
+def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[Path], workspace: Path) -> Dict[str, int]:
+    """Organize files into workspace. Runner modules are replaced entirely."""
     prompts_dir = workspace / ".github" / "prompts"
     charters_dir = workspace / "charters-agents"
     scripts_dir = workspace / "scripts"
-    stats = {"new": 0, "updated": 0, "unchanged": 0, "error": 0}
+    stats = {"new": 0, "updated": 0, "unchanged": 0, "error": 0, "modules_replaced": 0}
 
     all_files = vs_files + util_files
-    print(f"\n[INFO] Organizing {len(all_files)} files...")
+    print(f"\n[INFO] Organizing {len(all_files)} files + {len(runner_modules)} runner modules...")
     print(f"       Value-stream files: {len(vs_files)}")
     print(f"       Utility files: {len(util_files)}")
+    print(f"       Runner modules: {len(runner_modules)}")
 
+    # Handle runner modules first - FULL REPLACEMENT
+    for module_src in runner_modules:
+        module_name = module_src.name
+        module_dst = scripts_dir / module_name
+        
+        try:
+            # BELANGRIJK: Verwijder bestaande module VOLLEDIG (niet mergen!)
+            # Als workspace-folder 2 files heeft en agent-services 1 file,
+            # blijven na fetch alleen het 1 file uit agent-services over.
+            if module_dst.exists():
+                print(f"  [REPLACE] Removing existing {module_name}/ before copy")
+                shutil.rmtree(module_dst)
+            
+            # Copy entire module
+            shutil.copytree(module_src, module_dst)
+            print(f"  [MODULE] {module_name}/ -> {module_dst.relative_to(workspace)}")
+            stats["modules_replaced"] += 1
+            
+            # Validate __init__.py exists
+            init_file = module_dst / "__init__.py"
+            if not init_file.exists():
+                print(f"  [WARNING] Runner module {module_name}/ has no __init__.py")
+                
+        except Exception as e:
+            print(f"  [ERROR] Failed to replace module {module_name}: {e}")
+            stats["error"] += 1
+
+    # Handle individual files
     for src in all_files:
         dest = None
         if src.suffix == ".md":
@@ -184,15 +236,13 @@ def organize(vs_files: List[Path], util_files: List[Path], workspace: Path) -> D
             elif "prompt" in src.name.lower():
                 dest = prompts_dir / src.name
         elif src.suffix == ".py":
-            # preserve package structure if under runners/<package>/...
-            try:
-                rel = src.relative_to(src.parents[2])  # exports/<stream>/runners/...
-                if "runners" in rel.parts:
-                    dest = scripts_dir / Path(*rel.parts[rel.parts.index("runners") + 1:])
-                else:
-                    dest = scripts_dir / src.name
-            except ValueError:
-                dest = scripts_dir / src.name
+            # Check if this file is part of a module we already replaced
+            is_in_module = any(module_src in src.parents for module_src in runner_modules)
+            if is_in_module:
+                continue  # Skip, already handled by module copy
+            
+            # Standalone runner script
+            dest = scripts_dir / src.name
 
         if dest:
             status = _copy_file(src, dest)
@@ -267,17 +317,17 @@ def main() -> int:
             print("[ERROR] No applicable agents")
             return 1
 
-        vs_files, util_files, missing = resolve_files(repo, applicable)
+        vs_files, util_files, runner_modules, missing = resolve_files(repo, applicable)
         if missing:
             print("[WARN] Missing files:")
             for m in missing:
                 print(f"  - {m}")
 
-        if not vs_files and not util_files:
+        if not vs_files and not util_files and not runner_modules:
             print("[ERROR] No files resolved")
             return 1
 
-        stats = organize(vs_files, util_files, workspace)
+        stats = organize(vs_files, util_files, runner_modules, workspace)
 
         # Sync this script from source of truth (agent-services)
         self_status = sync_self_script(repo, workspace)
@@ -291,6 +341,8 @@ def main() -> int:
         if skipped:
             print(f"Agents skipped: {len(skipped)}")
         print(f"Files copied -> new: {stats['new']}, updated: {stats['updated']}, unchanged: {stats['unchanged']}, errors: {stats['error']}")
+        if stats.get('modules_replaced', 0) > 0:
+            print(f"Runner modules replaced: {stats['modules_replaced']} (⚠️  old content removed)")
         if self_status != "missing":
             print(f"fetch_agents.py sync: {self_status}")
         print("[SUCCESS] Agents fetched")

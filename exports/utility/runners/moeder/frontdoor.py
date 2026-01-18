@@ -64,7 +64,20 @@ def _write_trace(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Moeder runner (frontdoor). Orkestreert workspace ordening operaties."
+        description="Moeder runner (frontdoor). Orkestreert workspace ordening operaties.",
+        epilog="""
+Operaties (zie charter.moeder.md v2.2):
+  1. beheer-git          - Repository beheer (commits, branches, .gitignore, hooks)
+  2. configureer-github  - GitHub publicatie en configuratie  
+  3. orden-workspace     - Workspace structuur ordenen
+  4. schrijf-beleid      - Beleid genereren bij nieuwe workspace
+  5. zet-agent-boundary  - Agent boundary definitie (voor handoff naar Agent Smeder)
+  6. valideer-governance - Governance compliance validatie
+  7. fetch-agents        - Agents ophalen uit agent-services (LET OP: overschrijft bestaande!)
+
+Kerntaak 7 (beheer-workspace-state) is conversationeel - geen runner.
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(

@@ -339,6 +339,14 @@ def op_fetch_agents(
     
     Haalt agents op uit agent-services repository en installeert in workspace.
     Leest agents-publicatie.json om beschikbare agents te bepalen.
+    
+    BELANGRIJK - Overschrijfgedrag:
+    - Charters: Volledig overschreven met versie uit agent-services
+    - Prompts: Bestaande prompts met dezelfde naam overschreven; extra prompts behouden
+    - Runner module folders: Volledig verwijderd en vervangen (niet gemerged!)
+    
+    Dit is by design: fetching installeert de canonieke versie uit agent-services.
+    Workspace-specifieke aanpassingen worden overschreven.
     """
     # Valideer verplichte parameters
     if not value_stream:
@@ -441,7 +449,10 @@ def op_fetch_agents(
             if runner_module_src.exists() and runner_module_src.is_dir():
                 runner_module_dst = workspace_root / "scripts" / agent_naam
                 
-                # Verwijder bestaande module (met error handling)
+                # BELANGRIJK: Verwijder bestaande module VOLLEDIG (niet mergen!)
+                # Dit is by design - workspace krijgt de canonieke versie uit agent-services.
+                # Als workspace-folder 2 files heeft en agent-services 1 file,
+                # blijven na fetch alleen het 1 file uit agent-services over.
                 if runner_module_dst.exists():
                     try:
                         shutil.rmtree(runner_module_dst)

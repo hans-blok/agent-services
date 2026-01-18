@@ -219,7 +219,15 @@ Belangrijk: de Mandarin-EA **adviseert en ontwerpt**, maar **beslist en implemen
 
 ## Prompt-contract
 
-Zie `.github/prompts/mandarin-ea-definieer-strategie.prompt.md` voor het volledige interface-contract met input/output/foutafhandeling.
+Zie `exports/ondernemingsvorming/prompts/mandarin-ea-definieer-strategie.prompt.md` voor het volledige interface-contract met input/output/foutafhandeling.
+
+De prompt ondersteunt 4 artefact-types:
+1. **organisatie-principes**: Principes voor organisatiestructuur, governance, rollen
+2. **systeem-principes**: Principes voor technische architectuur, platformen, data
+3. **value-stream-definitie**: Definitie van een value stream met scope, stakeholders, agents
+4. **manifest**: Gecombineerd overzicht van principes en value streams voor een specifieke scope
+
+Elk artefact-type heeft zijn eigen verplichte en optionele parameters. Zie de prompt voor details.
 
 ---
 

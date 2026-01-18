@@ -12,10 +12,24 @@ Usage:
 
 Voor de Moeder agent voert de runner één operatie per run uit:
     beheer-git | configureer-github | orden-workspace | schrijf-beleid | 
-    zet-agent-boundary | valideer-governance
+    zet-agent-boundary | valideer-governance | fetch-agents
+
+Operaties:
+    1. beheer-git          - Repository beheer (commits, branches, .gitignore, hooks)
+    2. configureer-github  - GitHub publicatie en configuratie
+    3. orden-workspace     - Workspace structuur ordenen
+    4. schrijf-beleid      - Beleid genereren bij nieuwe workspace
+    5. zet-agent-boundary  - Agent boundary definitie
+    6. valideer-governance - Governance compliance validatie
+    7. fetch-agents        - Agents ophalen uit agent-services repository
+
+Kerntaak 7 (beheer-workspace-state) heeft geen runner - deze taak is conversationeel.
 
 Traceability:
     Standaard schrijft de runner een trace artefact weg in temp/.
+    Bij fetch-agents wordt ook een fetch-log geschreven naar docs/logs/.
+
+Charter: exports/utility/charters-agents/charter.moeder.md (versie 2.2)
 """
 
 import sys

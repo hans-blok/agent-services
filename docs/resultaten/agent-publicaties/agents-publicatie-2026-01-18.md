@@ -10,7 +10,7 @@
 
 - **Totaal aantal agents**: 12
 - **Aantal value streams**: 4
-- **Totaal aantal prompts**: 25
+- **Totaal aantal prompts**: 26
 - **Totaal aantal runners**: 3
 
 ### Per Value Stream
@@ -19,7 +19,7 @@
 |--------------|---------------|----------------|----------------|
 | kennispublicatie | 7 | 12 | 0 |
 | it-development | 2 | 4 | 2 |
-| ondernemingsvorming | 1 | 0 | 0 |
+| ondernemingsvorming | 1 | 1 | 0 |
 | utility | 2 | 9 | 1 |
 
 ---
@@ -49,7 +49,7 @@
 
 | Agent | Aantal prompts | Aantal runners |
 |-------|----------------|----------------|
-| mandarin-ea | 0 | 0 |
+| mandarin-ea | 1 | 0 |
 
 ### utility
 
