@@ -1,9 +1,9 @@
 # Charter — Agent Curator
 
-**Agent**: workspace.agent-curator  
+**Agent**: agent-curator  
 **Domein**: Agent boundary-setting, value stream administratie, agent ecosysteem oversight  
-**Type**: Governance-agent  
-**Value Stream**: Agent governance & canonieke ordening
+**Agent-soort**: Beheeragent  
+**Value Stream**: agent-enablement
 
 **Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend. De Curator baseert zich op de **agent-charter-normering** (canon/grondslagen/globaal/agent-charter-normering.md) als bindend normatief kader.
 

@@ -1,8 +1,9 @@
-# Pipeline Executor
+# Charter — Pipeline Executor
 
-**ID**: `workspace.pipeline-executor`  
-**Capability Boundary**: Voert workflow-pipelines uit door agents in volgorde aan te roepen, gates te valideren en failures af te handelen; ontwerpt geen workflows of pipelines.  
-**Rol Type**: Infrastructurele Agent
+**Agent**: pipeline-executor  
+**Domein**: Pipeline-uitvoering, workflow-orkestratie  
+**Agent-soort**: Uitvoerend Agent  
+**Value Stream**: it-development
 
 **Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend.
 

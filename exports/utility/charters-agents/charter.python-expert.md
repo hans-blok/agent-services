@@ -1,4 +1,9 @@
-# Charter — python-expert
+# Charter — Python Expert
+
+**Agent**: python-expert  
+**Domein**: Python-ontwikkeling, code-kwaliteit  
+**Agent-soort**: Uitvoerend Agent  
+**Value Stream**: utility
 
 **Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend.
 

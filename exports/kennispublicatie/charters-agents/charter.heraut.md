@@ -1,9 +1,9 @@
 # Charter — Heraut
 
-**Agent**: workspace.heraut  
+**Agent**: heraut  
 **Domein**: Canonieke aankondiging, governance communicatie  
-**Type**: Governance-agent  
-**Value Stream**: Governance & Orde
+**Agent-soort**: Uitvoerend Agent  
+**Value Stream**: kennispublicatie
 
 **Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend. De Heraut baseert zich op en kondigt de **agent-charter-normering** (canon/grondslagen/globaal/agent-charter-normering.md) aan als bindend normatief kader voor het agent eco-systeem.
 
