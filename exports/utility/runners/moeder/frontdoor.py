@@ -76,6 +76,7 @@ def build_parser() -> argparse.ArgumentParser:
             "schrijf-beleid",
             "zet-agent-boundary",
             "valideer-governance",
+            "fetch-agents",
         ],
         help="Welke operatie uitvoeren",
     )
@@ -116,6 +117,35 @@ def build_parser() -> argparse.ArgumentParser:
         help="Wat moet de agent kunnen (voor zet-agent-boundary)",
     )
 
+    # Specifieke parameters voor fetch-agents
+    parser.add_argument(
+        "--value-stream",
+        type=str,
+        default=None,
+        help="Value stream voor agents (voor fetch-agents, verplicht)",
+    )
+
+    parser.add_argument(
+        "--branch",
+        type=str,
+        default="main",
+        help="Branch van agent-services (voor fetch-agents, default: main)",
+    )
+
+    parser.add_argument(
+        "--agent-services-url",
+        type=str,
+        default="https://github.com/hans-blok/agent-services.git",
+        help="URL van agent-services repository (voor fetch-agents)",
+    )
+
+    parser.add_argument(
+        "--include-runners",
+        action="store_true",
+        default=True,
+        help="Ook runners ophalen (voor fetch-agents, default: true)",
+    )
+
     return parser
 
 
@@ -129,6 +159,10 @@ def run_frontdoor(*, workspace_root: Path) -> FrontdoorResult:
     scope: str | None = args.scope
     aanleiding: str | None = args.aanleiding
     gewenste_capability: str | None = args.gewenste_capability
+    value_stream: str | None = args.value_stream
+    branch: str = args.branch
+    agent_services_url: str = args.agent_services_url
+    include_runners: bool = args.include_runners
 
     try:
         result = execute_operation(
@@ -139,6 +173,10 @@ def run_frontdoor(*, workspace_root: Path) -> FrontdoorResult:
             scope=scope,
             aanleiding=aanleiding,
             gewenste_capability=gewenste_capability,
+            value_stream=value_stream,
+            branch=branch,
+            agent_services_url=agent_services_url,
+            include_runners=include_runners,
         )
 
         trace_path = _write_trace(
