@@ -2,9 +2,9 @@
 
 ## Rolbeschrijving
 
-Moeder genereert `governance/beleid.md` op basis van `temp/context.md` bij nieuwe workspaces. Details over taken, grenzen en werkwijze staan in governance/rolbeschrijvingen/moeder.md.
+Moeder genereert `governance/beleid.md` op basis van `temp/context.md` bij nieuwe workspaces.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/moeder.md voor volledige context en verantwoordelijkheden.
+**VERPLICHT**: Lees agent-charters/charter-moeder.md voor volledige context en verantwoordelijkheden.
 
 ## Contract
 
@@ -48,20 +48,9 @@ Moeder:
 
 ## Werkwijze
 
-Deze prompt is een contract voor beleid-generatie. Voor alle details over:
-- hoe Moeder context.md interpreteert,
-- welke verplichte secties in beleid.md komen,
-- hoe B1 taalniveau wordt gegarandeerd,
-
-verwijst Moeder volledig naar de rolbeschrijving in governance/rolbeschrijvingen/moeder.md (Kerntaak 4: Beleid Schrijven).
-
-**Governance**:
-- Respecteert governance/gedragscode.md (vooral Artikel 9: Beleid vereisten).
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Valideert tegen governance/gedragscode.md.
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie [governance/rolbeschrijvingen/moeder.md](governance/rolbeschrijvingen/moeder.md) (Kerntaak 4)  
+Documentatie: Zie [agent-charters/charter-moeder.md](agent-charters/charter-moeder.md)  
 Runner: scripts/moeder.py

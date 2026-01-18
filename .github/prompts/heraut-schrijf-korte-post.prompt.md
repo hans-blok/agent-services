@@ -4,7 +4,7 @@
 
 De Heraut kondigt reeds vastgestelde canonieke richtlijnen aan, legt de structuur en discipline uit, en maakt expliciet duidelijk wie wel en niet in de orde past.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/heraut.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees exports/kennispublicatie/charters-agents/charter.heraut.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -51,14 +51,9 @@ De Heraut:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor volledige governance en werkwijze verwijst de Heraut naar governance/rolbeschrijvingen/heraut.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Binnen de scope van governance/beleid.md.
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie governance/rolbeschrijvingen/heraut.md  
+Documentatie: Zie [exports/kennispublicatie/charters-agents/charter.heraut.md](exports/kennispublicatie/charters-agents/charter.heraut.md)  
 Runner: scripts/heraut.py

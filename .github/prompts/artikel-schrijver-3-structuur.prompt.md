@@ -4,7 +4,7 @@
 
 De Artikelschrijver bepaalt de structuur van het artikel: welke koppen, in welke volgorde, en welke logische flow.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/artikel-schrijver.md voor volledige context.
+**VERPLICHT**: Lees exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md voor volledige context.
 
 ## Contract
 
@@ -37,4 +37,4 @@ De Artikelschrijver:
 
 ---
 
-Documentatie: governance/rolbeschrijvingen/artikel-schrijver.md
+Documentatie: [exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md](exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md)

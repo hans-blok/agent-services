@@ -1,10 +1,10 @@
 # Moeder: Configureer GitHub
 
-## Charter
+## Rolbeschrijving
 
-Moeder configureert GitHub repository settings, collaboratie features en automation. Details over taken, grenzen en werkwijze staan in governance/charters-agents/charter-moeder.md.
+Moeder configureert GitHub repository settings, collaboratie features en automation. Details over taken, grenzen en werkwijze staan in de charter.
 
-**VERPLICHT**: Lees governance/charters-agents/charter-moeder.md voor volledige context en verantwoordelijkheden.
+**VERPLICHT**: Lees agent-charters/charter-moeder.md voor volledige context en verantwoordelijkheden.
 
 ## Contract
 
@@ -38,20 +38,9 @@ Moeder:
 
 ## Werkwijze
 
-Deze prompt is een contract voor GitHub-configuratie. Voor alle details over:
-- hoe Moeder GitHub precies configureert,
-- welke collaboratie features worden aanbevolen,
-- hoe automation wordt opgezet,
-
-verwijst Moeder volledig naar het charter in governance/charters-agents/charter-moeder.md (Kerntaak 2: GitHub Publicatie en Configuratie).
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform governance/agent-standaard.md.
-- Binnen de scope van governance/beleid.md.
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie [governance/charters-agents/charter-moeder.md](governance/charters-agents/charter-moeder.md) (Kerntaak 2)  
+Documentatie: Zie [agent-charters/charter-moeder.md](agent-charters/charter-moeder.md)  
 Runner: scripts/moeder.py

@@ -4,7 +4,7 @@
 
 De Agent Smeder ontwerpt en stelt nieuwe agents samen op basis van een expliciet gekozen capability boundary. Deze prompt gaat alleen over **stap 3**: het schrijven of bijwerken van het **charter** van de nieuwe agent, zodat het prompt-contract ook echt uitvoerbaar en ondubbelzinnig is.
 
-**VERPLICHT**: Lees governance/charters-agents/charter.agent-smeder.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees agent-charters/charter.agent-smeder.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -46,21 +46,9 @@ De Agent Smeder:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over traceability en scheiding contract/runner verwijst de Agent Smeder volledig naar governance/charters-agents/charter.agent-smeder.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Binnen de scope van governance/beleid.md.
-
-**Kwaliteitsborging en checks (altijd)**:
-- Verplichte secties conform artefacten/0-governance/agent-charter-normering.md zijn aanwezig.
-- B1 taalniveau en ondubbelzinnige formuleringen.
-- Grenzen (WEL/NIET) zijn expliciet en passen bij capability boundary.
-- Bestandslocatie en bestandsformaat kloppen: `governance/charters-agents/charter.<agent-naam>.md` (alleen `.md`).
+Voor alle details over werkwijze en kwaliteitsborging zie de charter.
 
 ---
 
-Documentatie: Zie governance/charters-agents/charter.agent-smeder.md  
+Documentatie: Zie [agent-charters/charter.agent-smeder.md](agent-charters/charter.agent-smeder.md)  
 Runner: scripts/agent-smeder.py

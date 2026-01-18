@@ -4,7 +4,7 @@
 
 De Agent Smeder ontwerpt en stelt nieuwe agents samen op basis van een expliciet gekozen capability boundary. Deze prompt gaat alleen over **stap 4**: het schrijven of bijwerken van de **runner** (Python script) van de nieuwe agent, zodat de agent uitvoerbaar en herhaalbaar wordt.
 
-**VERPLICHT**: Lees governance/charters-agents/charter.agent-smeder.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees agent-charters/charter.agent-smeder.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -43,21 +43,9 @@ De Agent Smeder:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over traceability en scheiding contract/runner verwijst de Agent Smeder volledig naar governance/charters-agents/charter.agent-smeder.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Binnen de scope van governance/beleid.md.
-
-**Kwaliteitsborging en checks (altijd)**:
-- Runner is minimaal, herhaalbaar en AI-vrij.
-- CLI-parameters, validaties en outputpaden zijn expliciet.
-- Outputlocaties volgen governance/workspace-doctrine.md.
-- Bestandslocatie en bestandsformaat kloppen: `scripts/<agent-naam>.py`.
+Voor alle details over werkwijze en kwaliteitsborging zie de charter.
 
 ---
 
-Documentatie: Zie governance/charters-agents/charter.agent-smeder.md  
+Documentatie: Zie [agent-charters/charter.agent-smeder.md](agent-charters/charter.agent-smeder.md)  
 Runner: scripts/agent-smeder.py

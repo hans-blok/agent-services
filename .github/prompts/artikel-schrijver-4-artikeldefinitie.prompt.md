@@ -4,7 +4,7 @@
 
 De Artikelschrijver definieert wat dit artikel precies IS: een zelfstandig stuk, geen fragment, geen hoofdstuk.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/artikel-schrijver.md voor volledige context.
+**VERPLICHT**: Lees exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md voor volledige context.
 
 ## Contract
 
@@ -32,4 +32,4 @@ De Artikelschrijver:
 
 ---
 
-Documentatie: governance/rolbeschrijvingen/artikel-schrijver.md
+Documentatie: [exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md](exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md)

@@ -4,7 +4,7 @@
 
 De Pipeline Executor voert multi-agent pipelines uit door workflow-documenten te lezen, agents sequentieel of parallel aan te roepen, quality gates te valideren en failures volgens pipeline-specificatie af te handelen.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/pipeline-executor.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees exports/utility/charters-agents/charter.pipeline-executor.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -58,22 +58,9 @@ Pipeline Executor:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over pipeline parsing, agent invocation, gate validation en failure handling verwijst Pipeline Executor volledig naar governance/rolbeschrijvingen/pipeline-executor.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-standaard.md.
-- Conform governance/agent-standaard.md.
-- Binnen de scope van governance/beleid.md.
-
-**Kwaliteitsborging en checks (altijd)**:
-- Pipeline-bestand is geldig (bevat Uitvoeringsketen, Kwaliteitsgates, Foutafhandeling).
-- Alle agents in pipeline bestaan (runners in scripts/).
-- Gate criteria zijn valideerbaar (bestanden bestaan, meetbare criteria).
-- Execution log bevat complete trace (elk stap, gate, failure gedocumenteerd).
-- Output is alleen `.md` (geen publicatieformaten).
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie governance/rolbeschrijvingen/pipeline-executor.md  
+Documentatie: Zie [exports/utility/charters-agents/charter.pipeline-executor.md](exports/utility/charters-agents/charter.pipeline-executor.md)  
 Runner: scripts/pipeline-executor.py

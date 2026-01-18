@@ -50,17 +50,4 @@ De Agent Publisher:
 
 ## Werkwijze
 
-Het prompt-contract is interface-only (input/output/foutafhandeling), geen interne stappen of implementatiedetails. Het blijft consistent met de capability boundary van de Agent Curator.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Binnen de scope van governance/beleid.md.
-- Verwijst voor rol- en uitvoeringdetails naar exports/kennispublicatie/charters-agents/charter.agent-publisher.md.
-
-**Kwaliteitsborging en checks (altijd)**:
-- Contract blijft interface-only: input/output/foutafhandeling.
-- Contract blijft binnen capability boundary; geen designbeslissingen door Publisher.
-- Output-afspraken eisen alleen `.md` rapportage; geen publicatieformaten door niet-Publisher agents.
-- Bestandslocatie en bestandsformaat kloppen: `exports/kennispublicatie/prompts/agent-publisher-publiceer.prompt.md`.
+Voor alle details over werkwijze zie de charter.

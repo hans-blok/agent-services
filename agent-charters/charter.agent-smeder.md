@@ -32,13 +32,17 @@ Belangrijk: de Agent Smeder **beslist niet of** een agent nodig is. De Agent Sme
 2. **Contract-first prompt ontwerpen (interface)**
    - Definieert input (verplicht/optioneel) en output (vaste deliverables).
    - Formuleert foutafhandeling (stoppen bij governance/scope-conflict).
-   - Houdt de prompt compact: details staan in het charter.
-   - Zorgt dat de **promptnaam volgt de conventie: `<agent-naam>-<werkwoord-gebiedende-wijs>.prompt.md`** (bijvoorbeeld "moeder-schrijf-beleid.prompt.md", "essayist-schrijf-essay.prompt.md"), zodat direct duidelijk is welke agent wat doet.
+   - Houdt de prompt **kort en interface-only**: alleen input/output/foutafhandeling.
+   - **Governance wordt NIET benoemd in prompts** - dit is een concern van charters.
+   - Prompts volstaan met verwijzing naar charter en runner.
+   - Zorgt dat de **promptnaam volgt de conventie: `<agent-naam>-<werkwoord-gebiedende-wijs>.prompt.md`** (bijvoorbeeld "moeder-beheer-git.prompt.md", "essayist-schrijf-essay.prompt.md"), zodat direct duidelijk is welke agent wat doet.
 
 3. **Charter opstellen (interne werking)**
-   - Schrijft een charter conform `artefacten/0-governance/agent-charter-normering.md`.
+   - Schrijft een charter conform `artefacten/0-governance/agent-charter-normering.md` (indien aanwezig in canon).
    - Maakt grenzen expliciet (WEL/NIET) en op B1-niveau.
    - Zorgt dat het charter traceerbaar is naar het prompt-contract.
+   - **Charter bevat governance-verwijzing** naar `beleid-workspace.md` en canon repository.
+   - Charter beschrijft interne werkwijze, kerntaken, grenzen - prompts doen dat niet.
 
 4. **Agent-skeleton neerzetten (structuur)**
    - Zet de basisbestanden neer volgens de agent-standaard (prompt, charter, runner).
@@ -73,8 +77,10 @@ Belangrijk: de Agent Smeder **beslist niet of** een agent nodig is. De Agent Sme
 - Duidelijke in/uit contracten per boundary.
 
 ### Contract-first ontwerp
-- Prompts als interface-contract (input/output/foutafhandeling).
-- Scheiden van contract en interne werkwijze.
+- Prompts als **interface-contract** (input/output/foutafhandeling only).
+- **Governance wordt niet benoemd in prompts** - dit hoort in charters.
+- Prompts zijn kort en verwijzen naar charter en runner voor details.
+- Scheiden van contract (wat) en interne werkwijze (hoe - in charter).
 - Ontwerp dat uitvoerbaar is met een runner.
 
 ### Traceability

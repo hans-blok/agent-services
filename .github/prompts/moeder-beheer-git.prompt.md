@@ -2,9 +2,9 @@
 
 ## Rolbeschrijving
 
-Moeder beheert Git workflows, branches, commits en .gitignore voor de workspace. Details over taken, grenzen en werkwijze staan in governance/rolbeschrijvingen/moeder.md.
+Moeder beheert Git workflows, branches, commits en .gitignore voor de workspace. Details over taken, grenzen en werkwijze staan in de charter.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/moeder.md voor volledige context en verantwoordelijkheden.
+**VERPLICHT**: Lees agent-charters/charter-moeder.md voor volledige context en verantwoordelijkheden (Kerntaak: Git/GitHub workflow).
 
 ## Contract
 
@@ -37,20 +37,9 @@ Moeder:
 
 ## Werkwijze
 
-Deze prompt is een contract voor Git-beheer. Voor alle details over:
-- hoe Moeder Git workflows precies inricht,
-- hoe keuzes worden gemaakt bij branch strategieën,
-- welke .gitignore patronen worden toegepast,
-
-verwijst Moeder volledig naar de rolbeschrijving in governance/rolbeschrijvingen/moeder.md (Kerntaak 1: Repository Beheer).
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Binnen de scope van governance/beleid.md.
+Voor alle details over werkwijze, Git workflows, branch strategieën en .gitignore patronen zie de charter.
 
 ---
 
-Documentatie: Zie [governance/rolbeschrijvingen/moeder.md](governance/rolbeschrijvingen/moeder.md) (Kerntaak 1)  
+Documentatie: Zie [agent-charters/charter-moeder.md](agent-charters/charter-moeder.md)  
 Runner: scripts/moeder.py

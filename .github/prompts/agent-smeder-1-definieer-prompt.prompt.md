@@ -4,7 +4,7 @@
 
 De Agent Smeder ontwerpt en stelt nieuwe agents samen op basis van een expliciet gekozen capability boundary. Deze prompt gaat alleen over **stap 2**: het schrijven of bijwerken van het **prompt-contract** van de nieuwe agent volgens de agent-standaard.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/agent-smeder.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees agent-charters/charter.agent-smeder.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -32,7 +32,7 @@ Bij een geldige opdracht levert de Agent Smeder altijd:
 
 Het prompt-contract:
 - Beschrijft alleen interface (input/output/foutafhandeling), geen interne stappen.
-- Verwijst voor details expliciet naar governance/rolbeschrijvingen/<agent-naam>.md.
+- Verwijst voor details naar de agent-charter.
 - Is consistent met de capability boundary.
 - Vraagt om output in `.md` (geen publicatieformaten; `.py` alleen voor runners, niet voor prompts).
 
@@ -45,21 +45,9 @@ De Agent Smeder:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over traceability (rol → prompt → runner) verwijst de Agent Smeder volledig naar governance/rolbeschrijvingen/agent-smeder.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Binnen de scope van governance/beleid.md.
-
-**Kwaliteitsborging en checks (altijd)**:
-- Contract blijft interface-only: input/output/foutafhandeling, geen interne stappen.
-- Contract blijft binnen capability boundary (scope creep = stoppen/vragen).
-- Output-afspraken bevatten geen publicatieformaten buiten Publisher.
-- Bestandslocatie en bestandsformaat kloppen: `.github/prompts/<agent-naam>-<werkwoord-gebiedende-wijs>.prompt.md`.
+Voor alle details over werkwijze en kwaliteitsborging zie de charter.
 
 ---
 
-Documentatie: Zie governance/rolbeschrijvingen/agent-smeder.md  
+Documentatie: Zie [agent-charters/charter.agent-smeder.md](agent-charters/charter.agent-smeder.md)  
 Runner: scripts/agent-smeder.py

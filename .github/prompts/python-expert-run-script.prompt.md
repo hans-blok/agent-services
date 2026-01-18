@@ -50,12 +50,4 @@ De Python Expert:
 
 ---
 
-Governance:
-- respecteert governance/gedragscode.md;
-- volgt governance/workspace-doctrine.md;
-- is conform charter.python-expert.md;
-- blijft binnen de scope van governance/beleid-standard.md.
-
----
-
-**VERPLICHT**: Lees governance/charters-agents/charter.python-expert.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees exports/it-development/charters-agents/charter.python-expert.md voor volledige context, grenzen en werkwijze.

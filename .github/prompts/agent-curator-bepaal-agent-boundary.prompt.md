@@ -4,7 +4,7 @@
 
 De Agent Curator bepaalt agent-boundaries op basis van gewenste capability en vastgestelde criteria (nummering, positionering, canon-consistentie). Deze prompt beschrijft het **interface-contract** voor de boundary-bepaling, die voorheen een taak van Moeder was.
 
-**VERPLICHT**: Lees docs/resultaten/moeder/agent-boundary-agent-curator.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees agent-charters/charter.agent-curator.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -57,24 +57,9 @@ De Agent Curator:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over boundary-criteria, agent-naming-conventie, en escalatie verwijst de Agent Curator volledig naar docs/resultaten/moeder/agent-boundary-agent-curator.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform agent-charter-normering.md (canon/grondslagen/globaal/).
-- Binnen de scope van governance/beleid.md.
-
-**Kwaliteitsborging en checks (altijd)**:
-- 4 outputregels volgen Moeder-formaat: agent-naam, capability-boundary, doel, domein
-- Agent-naam is lowercase met hyphens, duidelijk semantisch
-- Capability-boundary is één zin, scherp en ondubbelzinnig
-- Doel is één zin, helder wat de agent bijdraagt
-- Domein is één woord of korte frase
-- Bestand opgeslagen in: `docs/resultaten/agent-curator/agent-boundary-<agent-naam>.md`
-- Boundary blijft consistent met vastgestelde nummering, positionering en canon
+Voor alle details over werkwijze en kwaliteitsborging zie de charter.
 
 ---
 
-Documentatie: Zie docs/resultaten/moeder/agent-boundary-agent-curator.md  
+Documentatie: Zie [agent-charters/charter.agent-curator.md](agent-charters/charter.agent-curator.md)  
 Runner: scripts/agent-curator.py (indien nodig)

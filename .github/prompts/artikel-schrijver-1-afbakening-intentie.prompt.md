@@ -4,7 +4,7 @@
 
 De Artikelschrijver bepaalt de afbakening en intentie van het artikel, zodat duidelijk is wat wel en niet in het artikel hoort.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/artikel-schrijver.md voor volledige context.
+**VERPLICHT**: Lees exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md voor volledige context.
 
 ## Contract
 
@@ -35,4 +35,4 @@ De Artikelschrijver:
 
 ---
 
-Documentatie: governance/rolbeschrijvingen/artikel-schrijver.md
+Documentatie: [exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md](exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md)

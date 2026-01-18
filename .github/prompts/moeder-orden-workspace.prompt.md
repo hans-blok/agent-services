@@ -9,7 +9,7 @@ description: Ordent de workspace conform governance/workspace-doctrine.md
 
 Moeder bewaakt de ordening en basisstructuur van de workspace. Deze prompt gaat alleen over het contract voor het ordenen van de workspace (structuur, naamgeving, verplaatsen, opschonen).
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/moeder.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees agent-charters/charter-moeder.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -42,14 +42,9 @@ Moeder:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over verplaatsen/hernoemen, uitzonderingen en besluitregels verwijst Moeder naar governance/rolbeschrijvingen/moeder.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Binnen de scope van governance/beleid.md.
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie [governance/rolbeschrijvingen/moeder.md](governance/rolbeschrijvingen/moeder.md)  
+Documentatie: Zie [agent-charters/charter-moeder.md](agent-charters/charter-moeder.md)  
 Runner: scripts/moeder.py

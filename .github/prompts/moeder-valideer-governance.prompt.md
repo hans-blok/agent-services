@@ -2,9 +2,9 @@
 
 ## Rolbeschrijving
 
-Moeder valideert compliance met governance-documenten (workspace-standaard, gedragscode, beleid, agent-standaard). Details over taken, grenzen en werkwijze staan in governance/rolbeschrijvingen/moeder.md.
+Moeder valideert compliance met governance-documenten (workspace-standaard, gedragscode, beleid, agent-standaard).
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/moeder.md voor volledige context en verantwoordelijkheden.
+**VERPLICHT**: Lees agent-charters/charter-moeder.md voor volledige context en verantwoordelijkheden.
 
 ## Contract
 
@@ -40,20 +40,9 @@ Moeder:
 
 ## Werkwijze
 
-Deze prompt is een contract voor governance-validatie. Voor alle details over:
-- hoe Moeder governance-compliance precies valideert,
-- welke checks worden uitgevoerd per document,
-- hoe afwijkingen worden gerapporteerd,
-
-verwijst Moeder volledig naar de rolbeschrijving in governance/rolbeschrijvingen/moeder.md (Kerntaak 6: Governance Compliance).
-
-**Governance**:
-- Respecteert governance/gedragscode.md.
-- Volgt governance/workspace-doctrine.md.
-- Conform artefacten/0-governance/agent-charter-normering.md.
-- Valideert tegen governance/beleid.md.
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie [governance/rolbeschrijvingen/moeder.md](governance/rolbeschrijvingen/moeder.md) (Kerntaak 6)  
+Documentatie: Zie [agent-charters/charter-moeder.md](agent-charters/charter-moeder.md)  
 Runner: scripts/moeder.py

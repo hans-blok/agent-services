@@ -4,7 +4,7 @@
 
 De Schrijver produceren toegankelijke, vloeiende boektekst die bestaande concepten helder maakt zonder deze te analyseren, beargumenteren of normatief in te vullen.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/de-schrijver.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees agent-charters/charter.de-schrijver.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -35,14 +35,9 @@ De Schrijver:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over scope, input/output en interfaces verwijst De Schrijver naar governance/rolbeschrijvingen/de-schrijver.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md
-- Volgt governance/workspace-doctrine.md
-- Binnen de scope van governance/beleid.md
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie governance/rolbeschrijvingen/de-schrijver.md  
+Documentatie: Zie [agent-charters/charter.de-schrijver.md](agent-charters/charter.de-schrijver.md)  
 Runner: scripts/de-schrijver.py

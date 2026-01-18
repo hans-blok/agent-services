@@ -4,7 +4,7 @@
 
 De Artikelschrijver formuleert de kernboodschap van het artikel in één enkele, heldere zin.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/artikel-schrijver.md voor volledige context.
+**VERPLICHT**: Lees exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md voor volledige context.
 
 ## Contract
 
@@ -30,4 +30,4 @@ De Artikelschrijver:
 
 ---
 
-Documentatie: governance/rolbeschrijvingen/artikel-schrijver.md
+Documentatie: [exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md](exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md)

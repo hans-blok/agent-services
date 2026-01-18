@@ -4,7 +4,7 @@
 
 De Artikelschrijver schrijft zelfstandige, toegankelijke artikelen die één afgebakend onderwerp helder overbrengen met duidelijke focus en herkenbare opbouw, zonder nieuwe normen te formuleren.
 
-**VERPLICHT**: Lees governance/rolbeschrijvingen/artikel-schrijver.md voor volledige context, grenzen en werkwijze.
+**VERPLICHT**: Lees exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md voor volledige context, grenzen en werkwijze.
 
 ## Contract
 
@@ -75,14 +75,9 @@ De Artikelschrijver:
 
 ## Werkwijze
 
-Deze prompt is een contract op hoofdlijnen. Voor alle details over scope-afbakening, relaties tot andere agents en interfaces verwijst De Artikelschrijver naar governance/rolbeschrijvingen/artikel-schrijver.md.
-
-**Governance**:
-- Respecteert governance/gedragscode.md
-- Volgt governance/workspace-doctrine.md
-- Binnen de scope van governance/beleid.md
+Voor alle details over werkwijze zie de charter.
 
 ---
 
-Documentatie: Zie governance/rolbeschrijvingen/artikel-schrijver.md  
+Documentatie: Zie [exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md](exports/kennispublicatie/charters-agents/charter.artikel-schrijver.md)  
 Runner: scripts/artikel-schrijver.py
