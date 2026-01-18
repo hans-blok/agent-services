@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime
@@ -424,24 +425,46 @@ def op_fetch_agents(
             
             # Runners (optioneel)
             if include_runners:
-                runner_src = repo_path / "exports" / value_stream / "runners" / f"{agent_naam}.py"
-                if runner_src.exists():
-                    runner_dst = workspace_root / "scripts" / f"{agent_naam}.py"
-                    runner_dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(runner_src, runner_dst)
-                    artifacts.append(runner_dst)
-                    runners_count += 1
-                
-                # Runner module folder (indien aanwezig)
-                runner_module_src = repo_path / "exports" / value_stream / "runners" / agent_naam
-                if runner_module_src.exists() and runner_module_src.is_dir():
-                    runner_module_dst = workspace_root / "scripts" / agent_naam
-                    if runner_module_dst.exists():
-                        shutil.rmtree(runner_module_dst)
-                    shutil.copytree(runner_module_src, runner_module_dst)
-                    artifacts.append(runner_module_dst)
+            runner_found = False  # Track of deze agent een runner heeft
             
-            installed_count += 1
+            # Standalone runner file
+            runner_src = repo_path / "exports" / value_stream / "runners" / f"{agent_naam}.py"
+            if runner_src.exists():
+                runner_dst = workspace_root / "scripts" / f"{agent_naam}.py"
+                runner_dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(runner_src, runner_dst)
+                artifacts.append(runner_dst)
+                runner_found = True
+            
+            # Runner module folder (indien aanwezig)
+            runner_module_src = repo_path / "exports" / value_stream / "runners" / agent_naam
+            if runner_module_src.exists() and runner_module_src.is_dir():
+                runner_module_dst = workspace_root / "scripts" / agent_naam
+                
+                # Verwijder bestaande module (met error handling)
+                if runner_module_dst.exists():
+                    try:
+                        shutil.rmtree(runner_module_dst)
+                    except (PermissionError, OSError) as e:
+                        raise PolicyError(
+                            f"Kan bestaande runner module niet verwijderen: {runner_module_dst}\n"
+                            f"Fout: {e}\n"
+                            f"Tip: Sluit programma's die deze files gebruiken."
+                        )
+                
+                # Kopieer module
+                shutil.copytree(runner_module_src, runner_module_dst)
+                artifacts.append(runner_module_dst)
+                runner_found = True
+                
+                # Valideer module heeft __init__.py
+                init_file = runner_module_dst / "__init__.py"
+                if not init_file.exists():
+                    print(f"[WARNING] Runner module {agent_naam}/ heeft geen __init__.py", file=sys.stderr)
+            
+            # Tel als 1 runner (ongeacht file/module structuur)
+            if runner_found:
+                runners_count += 1
         
         # Genereer manifest
         manifest_dst = workspace_root / "docs" / "agents-manifest.md"
@@ -469,6 +492,50 @@ def op_fetch_agents(
         
         manifest_dst.write_text("".join(manifest_lines), encoding="utf-8")
         artifacts.append(manifest_dst)
+        
+        # Genereer fetch-log met timestamp
+        logs_dir = workspace_root / "docs" / "logs"
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        
+        log_timestamp = datetime.now()
+        timestamp = log_timestamp.strftime("%Y%m%d-%H%M%S")
+        log_dst = logs_dir / f"fetch-agents-{timestamp}.md"
+        
+        log_lines = [
+            f"# Fetch Agents Log\n\n",
+            f"**Datum**: {log_timestamp.strftime('%Y-%m-%d')}\n",
+            f"**Tijd**: {log_timestamp.strftime('%H:%M:%S')}\n",
+            f"**Value Stream**: {value_stream}\n",
+            f"**Branch**: {branch}\n",
+            f"**Repository**: {agent_services_url}\n\n",
+            f"## Status\n\n",
+            f"✓ SUCCESS: {installed_count} agents geïnstalleerd\n\n",
+            f"## Geïnstalleerde Agents\n\n",
+        ]
+        
+        for agent in filtered_agents:
+            log_lines.append(
+                f"- **{agent.get('naam')}**: "
+                f"{agent.get('aantalPrompts', 0)} prompts"
+            )
+            if include_runners and agent.get('aantalRunners', 0) > 0:
+                log_lines.append(f", {agent.get('aantalRunners')} runners")
+            log_lines.append("\n")
+        
+        log_lines.append(f"\n## Totaal Statistieken\n\n")
+        log_lines.append(f"| Categorie | Aantal |\n")
+        log_lines.append(f"|-----------|--------|\n")
+        log_lines.append(f"| Agents | {installed_count} |\n")
+        log_lines.append(f"| Prompts | {prompts_count} |\n")
+        log_lines.append(f"| Runners | {runners_count} |\n")
+        log_lines.append(f"\n## Locaties\n\n")
+        log_lines.append(f"- Charters: `charters-agents/`\n")
+        log_lines.append(f"- Prompts: `.github/prompts/`\n")
+        log_lines.append(f"- Runners: `scripts/`\n")
+        log_lines.append(f"- Manifest: `docs/agents-manifest.md`\n")
+        
+        log_dst.write_text("".join(log_lines), encoding="utf-8")
+        artifacts.append(log_dst)
     
     message = (
         f"Agents opgehaald: {installed_count} agents, {prompts_count} prompts, {runners_count} runners "

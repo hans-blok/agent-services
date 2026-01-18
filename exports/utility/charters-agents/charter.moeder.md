@@ -152,6 +152,7 @@ Bron: `exports/utility/prompts/moeder-fetch-agents.prompt.md`
 - **Prompts installeren**: Kopieert prompts naar workspace `.github/prompts/`
 - **Runners installeren**: Kopieert runners naar workspace `scripts/` (optioneel)
 - **Manifest genereren**: Documenteert geïnstalleerde agents in `docs/agents-manifest.md`
+- **Logging**: Schrijft fetch-log naar `docs/logs/fetch-agents-<datum>-<tijd>.md` met timestamp, value-stream, branch, geïnstalleerde agents en locaties
 - **Validatie**: Verifieert dat alle artefacten correct geïnstalleerd zijn
 
 ## Specialisaties
@@ -347,7 +348,14 @@ Gebruik `exports/utility/prompts/moeder-fetch-agents.prompt.md`:
 
 **Output**:
 - Lijst van geïnstalleerde agents (naam, value-stream, aantal prompts, aantal runners)
-- Overzicht gekopieerde artefacten met locaties
+- Overzicht gekopieerde artefacten met (`docs/agents-manifest.md`)
+- **Fetch-log** met timestamp (`docs/logs/fetch-agents-<YYYYMMDD>-<HHMMSS>.md`):
+  - Datum en tijdstip van fetch
+  - Value stream en branch
+  - Repository URL
+  - Lijst van geïnstalleerde agents met aantallen
+  - Totaal statistieken (agents, prompts, runners)
+  - Status: success/failed locaties
 - Manifest bestand met traceerbaarheid
 
 **Foutafhandeling**:
