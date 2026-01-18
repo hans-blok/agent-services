@@ -65,6 +65,16 @@ Bij het **verplaatsen** van bestanden kiest Moeder altijd voor **één bron**:
 - wanneer een bestand naar een andere locatie of workspace moet, wordt het **verplaatst** (bijvoorbeeld via `git mv`) en niet gekopieerd;  
 - er blijven geen dubbele kopieën van hetzelfde bronbestand bestaan in verschillende folders of repositories.
 
+**Workspace-specifieke regel voor agent-services repository**:
+
+In de agent-services workspace bevat `.github/prompts/` **alleen** prompts van workspace-agents die hier gebruikt worden:
+- **moeder** (6 prompts: beheer-git, configureer-github, orden-workspace, schrijf-beleid, valideer-governance; fetch-agents blijft in exports/)
+- **agent-curator** (4 prompts: analyseer-ecosysteem, bepaal-agent-boundary, onderhoud-value-streams, publiceer-agents-overzicht)
+- **agent-smeder** (3 prompts: 1-definieer-prompt, 2-schrijf-charter, 3-schrijf-runner)
+- **python-expert** (3 prompts: review-code, run-script, schrijf-script)
+
+Alle overige agents (kennispublicatie, it-development, ondernemingsvorming) hebben hun prompts **alleen** in `exports/<value-stream>/prompts/` omdat deze agents via fetch-agents naar andere workspaces worden geïnstalleerd. De bron voor alle agents is `exports/`; `.github/prompts/` is de lokale instantie voor workspace-gebruik.
+
 **Prompt-conventies voor multi-step agents** (zie `governance/workspace-doctrine.md`):
 - Meerdere prompts krijgen sorteerbare namen: `{agent-naam}-{volgnummer}-{korte-omschrijving}.prompt.md`
 - Voorbeeld: `agent-smeder-1-initiele-agent.prompt.md`, `agent-smeder-2-definieer-prompt.prompt.md`
