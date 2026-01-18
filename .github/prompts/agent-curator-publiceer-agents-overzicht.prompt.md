@@ -18,9 +18,7 @@ De Agent Curator publiceert een overzicht van alle agents op basis van hun chart
 
 **Optionele parameters**:
 - include-drafts: Ook agents in draft-status meenemen (type: boolean, default: false)
-- output-format: Formaat van het overzicht (type: string, waarden: 'markdown-tabel' | 'json' | 'yaml', default: 'markdown-tabel')
-- include-prompts: Ook prompt-details meenemen (type: boolean, default: true)
-- sort-by: Sortering van het overzicht (type: string, waarden: 'agent-naam' | 'value-stream' | 'agent-soort', default: 'value-stream')
+- sort-by: Sortering van het overzicht (type: string, waarden: 'agent-naam' | 'value-stream', default: 'agent-naam')
 
 ### Output (Wat komt eruit)
 
@@ -31,8 +29,8 @@ Bij een geldige opdracht levert de Agent Curator altijd:
 - Kolommen: Agent | Value Stream | Aantal prompts | Aantal runners
 - Gegroepeerd per value stream
 - Opgeslagen in:
-  - **Root**: `agents-publicatie.md` (publiceerbaar, zonder datum)
-  - **Archief**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (met metadata)
+  - **Root**: `agents-publicatie.json` (JSON-formaat voor fetching, zonder datum)
+  - **Archief**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (markdown met metadata)
 
 **Bij scope='value-stream'**:
 - **Value stream specifiek overzicht** met alle agents in opgegeven stream
@@ -48,15 +46,17 @@ Bij een geldige opdracht levert de Agent Curator altijd:
 
 **Algemene output-structuur**:
 
-**Root publicatie** (`agents-publicatie.md`):
-- Bondig overzicht volgens template (`templates/agents-publicatie-template.md`)
-- Tabel: Agent | Value Stream | Aantal prompts | Aantal runners
-- Gebruik-sectie met folder-locaties (exports/<value-stream>/{charters-agents/, prompts/, runners/})
+**Root publicatie** (`agents-publicatie.json`):
+- JSON-formaat voor eenvoudige parsing door fetch scripts
+- Structuur: {publicatiedatum, versie, agents[], valueStreams[], locaties{}}
+- Per agent: naam, valueStream, aantalPrompts, aantalRunners
+- Folder-locaties voor charters, prompts en runners
 - Geen metadata, geen datum in bestandsnaam
 
 **Archief** (`docs/resultaten/agent-publicaties/`):
-- Volledige versie met metadata (publicatiedatum, gescande folders, aantal charters)
-- Herkomstverantwoording (welke folders gescand, welke charters gelezen)
+- Markdown-formaat met volledige metadata
+- Gegroepeerd per value stream met tabellen
+- Samenvatting, herkomstverantwoording, gescande folders
 - Datum in bestandsnaam voor traceerbaarheid
 
 **Voor fetching vanuit project workspaces**:

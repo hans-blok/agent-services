@@ -55,11 +55,12 @@ De Agent Curator bewaakt daarbij:
 - Publiceert **bondig overzicht** van alle agents uit exports/ folders
 - Scant alle charters voor metadata (agent-naam, value stream, domein)
 - Scant exports/<value-stream>/prompts/ en runners/ folders voor aantallen
-- Genereert publicatie-tabel: Agent | Value Stream | Aantal prompts | Aantal runners
-- Gebruikt template: `templates/agents-publicatie-template.md`
+- Genereert twee outputs:
+  - **JSON**: voor fetch scripts (gestructureerde data)
+  - **Markdown**: voor documentatie (tabellen per value stream)
 - Overzicht dient als basis voor fetching vanuit project workspaces
-- Opslaan in **root**: `agents-publicatie.md` (publiceerbaar, bondig, zonder datum)
-- Opslaan in **archief**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (met metadata)
+- Opslaan in **root**: `agents-publicatie.json` (JSON voor fetching, zonder datum)
+- Opslaan in **archief**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (markdown met metadata)
 - Bron: `.github/prompts/agent-curator-publiceer-agents-overzicht.prompt.md`
 
 ---
@@ -138,12 +139,11 @@ De Curator heeft geen specialisaties; het is een governance-agent met vaste admi
 6. Verzamel per agent: agent-naam, value stream, aantal prompts, aantal runners
 7. Filter op basis van scope (volledig, specifieke stream, specifieke soort)
 8. Sorteer alfabetisch op agent-naam voor publicatie
-9. Gebruik template: `templates/agents-publicatie-template.md`
-10. Genereer publicatie-tabel: Agent | Value Stream | Aantal prompts | Aantal runners
-11. Voeg gebruik-sectie toe met folder-locaties (zonder bestandsnamen)
-12. Opslaan **root-publicatie**: `agents-publicatie.md` (bondig, zonder datum)
-13. Opslaan **archief-versie**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (met metadata)
-14. Root-bestand is basis voor fetching: unieke agent-naam + value stream + artefacten
+9. Genereer **JSON-structuur**: {publicatiedatum, versie, agents[], valueStreams[], locaties{}}
+10. Genereer **Markdown-tabellen**: gegroepeerd per value stream met samenvatting
+11. Opslaan **root-publicatie**: `agents-publicatie.json` (JSON voor fetch scripts, zonder datum)
+12. Opslaan **archief-versie**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (markdown met metadata)
+13. JSON-bestand is basis voor fetching: gestructureerde data voor automatisering
 
 ### Foutafhandeling
 - **Bij onbekende value stream**: Curator stopt, vraagt om toevoegen via 'onderhoud-value-streams' prompt
@@ -175,9 +175,8 @@ Alle boundaries, value stream toewijzingen, ecosysteem-analyses en publicaties z
 - Value streams: geregistreerd in `docs/resultaten/agent-curator/value-streams-overzicht.md`
 - Boundaries: opgeslagen in `docs/resultaten/agent-curator/agent-boundary-<agent-naam>.md`
 - Ecosysteem-analyses: gearchiveerd per datum in `docs/resultaten/agent-curator/agent-ecosystem-analyse-<datum>.md`
-- Archief-overzichten: opgeslagen in `docs/resultaten/agent-publicaties/agents-publicatie-<datum|filter>.md` (volledig met metadata)
-- Root-publicatie: opgeslagen in `agents-publicatie.md` (bondig volgens template, zonder datum)
-- Template: `templates/agents-publicatie-template.md`
+- Archief-overzichten: opgeslagen in `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (markdown met metadata)
+- Root-publicatie: opgeslagen in `agents-publicatie.json` (JSON voor fetch scripts, zonder datum)
 - Referentie naar vastgestelde governance: vermelding van bronnen in elk rapport
 - Charter-scans: vermelding van gescande exports/ folders (charters, prompts, runners)
 
@@ -187,6 +186,7 @@ Alle boundaries, value stream toewijzingen, ecosysteem-analyses en publicaties z
 
 | Datum | Versie | Wijziging | Auteur |
 |------|--------|-----------|--------|
+| 2026-01-18 | 0.4.3 | Output-formaten aangepast: root agents-publicatie.json (JSON voor fetching), archief markdown met metadata | Agent Smeder |
 | 2026-01-18 | 0.4.2 | Output-locaties aangepast: root agents-publicatie.md (zonder datum), archief docs/resultaten/agent-publicaties/ (met datum) | Agent Smeder |
 | 2026-01-18 | 0.4.1 | Agents publicatie bijgewerkt: bondig template (Agent, Value Stream, Aantal prompts, Aantal runners), scant exports/<value-stream>/prompts en runners | Agent Smeder |
 | 2026-01-18 | 0.4.0 | Agents publicatie toegevoegd: 10 kerntaken, 4 prompts, overzichten voor workspace fetching | Agent Smeder |

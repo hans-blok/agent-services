@@ -1,0 +1,89 @@
+{
+  "publicatiedatum": "2026-01-18",
+  "versie": "1.0",
+  "agents": [
+    {
+      "naam": "agent-publisher",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "artikel-schrijver",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 6,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "de-schrijver",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 0,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "essayist",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "heraut",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 2,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "presentatie-architect",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "vertaler",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "pipeline-executor",
+      "valueStream": "it-development",
+      "aantalPrompts": 1,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "workflow-architect",
+      "valueStream": "it-development",
+      "aantalPrompts": 3,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "mandarin-ea",
+      "valueStream": "ondernemingsvorming",
+      "aantalPrompts": 0,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "moeder",
+      "valueStream": "utility",
+      "aantalPrompts": 6,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "python-expert",
+      "valueStream": "utility",
+      "aantalPrompts": 3,
+      "aantalRunners": 0
+    }
+  ],
+  "valueStreams": [
+    "kennispublicatie",
+    "it-development",
+    "ondernemingsvorming",
+    "utility"
+  ],
+  "locaties": {
+    "charters": "exports/<value-stream>/charters-agents/charter.<agent-naam>.md",
+    "prompts": "exports/<value-stream>/prompts/<agent-naam>-<werkwoord>.prompt.md",
+    "runners": "exports/<value-stream>/runners/<agent-naam>.py"
+  }
+}
