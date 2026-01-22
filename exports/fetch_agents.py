@@ -54,8 +54,31 @@ def run_command(cmd: List[str], cwd: Path | None = None) -> str:
 
 
 def fetch_repo(repo_url: str, temp_dir: Path) -> Path:
+    """Clone or pull agent-services repository.
+    
+    Als de repository al bestaat in temp_dir/agent-services, wordt een git pull gedaan.
+    Anders wordt de repository ge-cloned.
+    
+    Dit zorgt ervoor dat altijd de laatste versie wordt opgehaald.
+    """
     clone_path = temp_dir / "agent-services"
-    run_command(["git", "clone", "--depth", "1", repo_url, str(clone_path)])
+    
+    if clone_path.exists() and (clone_path / ".git").exists():
+        # Repository bestaat al - doe een pull
+        print(f"[INFO] Repository bestaat al, pulling latest changes...")
+        try:
+            run_command(["git", "pull"], cwd=clone_path)
+            print(f"[INFO] Pull completed successfully")
+        except RuntimeError as e:
+            # Als pull faalt, verwijder de folder en clone opnieuw
+            print(f"[WARN] Pull failed, re-cloning: {e}")
+            shutil.rmtree(clone_path)
+            run_command(["git", "clone", "--depth", "1", repo_url, str(clone_path)])
+    else:
+        # Repository bestaat nog niet - clone
+        print(f"[INFO] Cloning repository...")
+        run_command(["git", "clone", "--depth", "1", repo_url, str(clone_path)])
+    
     return clone_path
 
 
@@ -312,7 +335,7 @@ def write_fetch_log(workspace: Path, value_stream: str, meta: Dict[str, str], ap
 
 def sync_self_script(repo_path: Path, workspace: Path) -> str:
     """Update the local fetch_agents.py from the source repo if available."""
-    src = repo_path / "scripts" / "fetch_agents.py"
+    src = repo_path / "exports" / "fetch_agents.py"
     dest = workspace / "scripts" / "fetch_agents.py"
 
     if not src.exists():
@@ -345,11 +368,12 @@ def main() -> int:
     value_stream = args.value_stream.strip("'\"") if args.value_stream else None
     workspace = Path(os.getcwd())
 
-    tmp_ctx = tempfile.TemporaryDirectory()
-    tmp_dir = Path(tmp_ctx.name)
+    # Gebruik persistente agent-services folder in workspace root voor git pull functionaliteit
+    agent_services_dir = workspace / "agent-services"
+    agent_services_dir.mkdir(exist_ok=True)
 
     try:
-        repo = fetch_repo(args.source_repo, tmp_dir)
+        repo = fetch_repo(args.source_repo, agent_services_dir.parent)
         specs, meta, _loc = load_manifest(repo, args.manifest)
         streams = derive_streams(specs)
 
@@ -411,11 +435,6 @@ def main() -> int:
     except Exception as e:
         print(f"[ERROR] {e}")
         return 1
-    finally:
-        if not args.no_cleanup:
-            tmp_ctx.cleanup()
-        else:
-            print(f"[DEBUG] Temp dir retained: {tmp_dir}")
 
 
 if __name__ == "__main__":

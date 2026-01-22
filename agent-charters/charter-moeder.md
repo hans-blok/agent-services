@@ -157,6 +157,8 @@ Bron: `moeder-beheer-workspace-state.prompt.md`
 ### 8. Agents Ophalen (Fetching)
 Bron: `exports/utility/prompts/moeder-fetch-agents.prompt.md`
 
+- **Repository synchroniseren**: Haalt meest recente versie op uit agent-services repository via git pull (of clone bij eerste keer)
+- **Persistente cache**: Gebruikt `agent-services/` folder in workspace root voor snelle updates
 - **Register raadplegen**: Leest `agents-publicatie.json` uit agent-services repository
 - **Value stream filtering**: Haalt alle agents op uit opgegeven value stream
 - **Branch selectie**: Gebruikt specifieke branch (main, develop) van agent-services
@@ -167,13 +169,15 @@ Bron: `exports/utility/prompts/moeder-fetch-agents.prompt.md`
 - **Logging**: Schrijft fetch-log naar `docs/logs/fetch-agents-<datum>-<tijd>.md` met timestamp, value-stream, branch, geïnstalleerde agents en locaties
 - **Validatie**: Verifieert dat alle artefacten correct geïnstalleerd zijn
 
-**BELANGRIJK - Overschrijfgedrag**:
-Wanneer agents worden gefetched, worden **bestaande artefacten volledig overschreven**:
-- **Charters**: Bestaand charter wordt vervangen door nieuwe versie uit agent-services
-- **Prompts**: Bestaande prompts met dezelfde naam worden overschreven; extra prompts in workspace blijven behouden
+**BELANGRIJK - Volledige Vervanging (Clean Install)**:
+Bij elke fetch worden **alle agent-artefacten volledig vervangen** met de meest recente versie uit agent-services:
+- **Meest recente versie**: Git pull haalt altijd de laatste changes op voordat agents worden geïnstalleerd
+- **Charters**: Bestaand charter wordt volledig vervangen door nieuwe versie uit agent-services
+- **Prompts**: Bestaande prompts met dezelfde naam worden volledig overschreven; extra prompts in workspace blijven behouden
 - **Runner module folders**: Bestaande runner module folder (bijv. `scripts/moeder/`) wordt **volledig verwijderd en vervangen**. Als de workspace-folder 2 bestanden bevat en de agent-services folder 1 bestand, blijft na fetch **alleen het 1 bestand uit agent-services** over.
+- **Alles opnieuw opgebouwd**: Workspace krijgt een complete, verse installatie vanuit agent-services zonder merge of incrementele updates
 
-Dit gedrag is **by design**: fetching installeert de canonieke versie uit agent-services. Workspace-specifieke aanpassingen aan gefetchte agents worden overschreven. Voor workspace-specifieke agents (die niet gefetched worden) geldt dit niet.
+Dit gedrag is **by design**: fetching installeert de canonieke, meest recente versie uit agent-services. Workspace-specifieke aanpassingen aan gefetchte agents worden overschreven. Voor workspace-specifieke agents (die niet gefetched worden) geldt dit niet.
 
 ## Specialisaties
 
@@ -356,31 +360,46 @@ Gebruik `exports/utility/prompts/moeder-fetch-agents.prompt.md`:
 
 **Proces**:
 1. **Validate input**: Check value-stream en branch parameters
-2. **Fetch repository**: Clone of pull agent-services repository
+2. **Repository synchroniseren**: 
+   - Persistente cache in `agent-services/` folder
+   - Bij bestaande repository: git pull voor laatste versie
+   - Bij nieuwe workspace: clone volledige repository
 3. **Lees register**: Parse `agents-publicatie.json` uit opgegeven branch
 4. **Filter agents**: Selecteer alle agents uit opgegeven value-stream
 5. **Fetch artefacten**:
-   - Charters uit `exports/<value-stream>/charters-agents/`
-   - Prompts uit `exports/<value-stream>/prompts/`
-   - Runners uit `exports/<value-stream>/runners/` (indien include-runners=true)
-6. **Install lokaal**:
-   - Charters naar workspace locatie (volgens workspace-doctrine)
-   - Prompts naar `.github/prompts/`
-   - Runners naar `scripts/`
+   - Charters uit correcte locatie volgens `locaties.charters` in manifest
+   - Prompts uit correcte locatie volgens `locaties.prompts` in manifest
+   - Runners (individual .py en modules) uit `scripts/runners/` (indien include-runners=true)
+   - `fetch_agents.py` zelf uit `exports/fetch_agents.py`
+6. **Volledige vervanging (Clean Install)**:
+   - Charters → workspace locatie (volledig overschreven)
+   - Prompts → `.github/prompts/` (zelfde naam overschreven, extra behouden)
+   - Runner modules → `scripts/` (oude module VOLLEDIG verwijderd, dan gekopieerd)
+   - Individual runners → `scripts/` (overschreven)
+   - `fetch_agents.py` → `scripts/fetch_agents.py`
 7. **Verify**: Valideer dat alle artefacten correct geïnstalleerd zijn
-8. **Manifest**: Genereer `docs/agents-manifest.md` met overzicht
+8. **Logging**: Genereer fetch-log met timestamp in `docs/logs/`
 
 **Output**:
 - Lijst van geïnstalleerde agents (naam, value-stream, aantal prompts, aantal runners)
-- Overzicht gekopieerde artefacten met (`docs/agents-manifest.md`)
 - **Fetch-log** met timestamp (`docs/logs/fetch-agents-<YYYYMMDD>-<HHMMSS>.md`):
   - Datum en tijdstip van fetch
   - Value stream en branch
-  - Repository URL
+  - Repository URL en synchronisatie-methode (clone/pull)
   - Lijst van geïnstalleerde agents met aantallen
-  - Totaal statistieken (agents, prompts, runners)
-  - Status: success/failed locaties
-- Manifest bestand met traceerbaarheid
+  - Bestandsoperaties (nieuw, bijgewerkt, ongewijzigd)
+  - Runner modules volledig vervangen (count)
+  - Status fetch_agents.py sync
+  - Locaties waar artefacten zijn geïnstalleerd
+
+**BELANGRIJK - Volledige Vervanging (Clean Install)**:
+- **Charters**: Volledig overschreven met versie uit agent-services
+- **Prompts**: Bestaande prompts met dezelfde naam overschreven; extra prompts behouden
+- **Runner modules**: Oude module-folder VOLLEDIG verwijderd, dan vervangen (niet gemerged!)
+- **fetch_agents.py**: Automatisch bijgewerkt naar laatste versie
+- Dit gedrag is by design: fetching installeert altijd de canonieke, meest recente versie
+- Workspace-specifieke aanpassingen aan agents worden overschreven
+- Voor persistente aanpassingen: fork agent of maak nieuwe agent
 
 **Foutafhandeling**:
 - Stopt bij ontbrekende value-stream of branch parameter

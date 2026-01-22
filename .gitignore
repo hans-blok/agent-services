@@ -1,0 +1,107 @@
+# Agent Services - .gitignore
+# Gegenereerd door Moeder volgens workspace-doctrine.md
+# Datum: 2026-01-22
+
+# ===================================
+# Workspace Folders (Runtime/Cache)
+# ===================================
+# Agent cache en synchronisatie
+agent-services/
+
+# Logs van fetch operaties en agent runs
+logs/
+
+# Tijdelijke bestanden en workspaces
+temp/
+
+# Canon folder (experimenteel/draft)
+canon/
+
+# ===================================
+# Python
+# ===================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# ===================================
+# Editor / IDE
+# ===================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (PyCharm, IntelliJ, etc.)
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ===================================
+# OS Files
+# ===================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ===================================
+# Git
+# ===================================
+*.orig
+*.rej
+*.patch
+
+# ===================================
+# Miscellaneous
+# ===================================
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Lock files (optioneel - uncommit indien gewenst)
+# poetry.lock
+# Pipfile.lock
