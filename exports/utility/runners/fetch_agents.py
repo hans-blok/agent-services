@@ -82,16 +82,6 @@ def fetch_repo(repo_url: str, temp_dir: Path) -> Path:
     return clone_path
 
 
-def get_template(loc_dict, vs: str) -> str | None:
-    """Get location template for value stream, with fallback to default."""
-    if isinstance(loc_dict, str):
-        return loc_dict  # Old format: single string template
-    if isinstance(loc_dict, dict):
-        # New format: per-value-stream dict with optional default
-        return loc_dict.get(vs) or loc_dict.get("default")
-    return None
-
-
 def load_manifest(repo_path: Path, manifest_name: str) -> Tuple[List[AgentSpec], Dict[str, str], Dict[str, str]]:
     manifest_path = repo_path / manifest_name
     if not manifest_path.exists():
@@ -115,17 +105,14 @@ def load_manifest(repo_path: Path, manifest_name: str) -> Tuple[List[AgentSpec],
         agent_type = "utility" if value_stream.lower() == "utility" else "value-stream"
         files: List[Path] = []
         # charter
-        charter_tpl = get_template(locaties.get("charters"), value_stream)
-        if charter_tpl:
-            files.append(Path(charter_tpl.replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
+        if locaties.get("charters"):
+            files.append(Path(locaties["charters"].replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
         # prompts (wildcard)
-        prompts_tpl = get_template(locaties.get("prompts"), value_stream)
-        if aantal_prompts > 0 and prompts_tpl:
-            files.append(Path(prompts_tpl.replace("<value-stream>", value_stream).replace("<agent-naam>", naam).replace("<werkwoord>", "*")))
+        if aantal_prompts > 0 and locaties.get("prompts"):
+            files.append(Path(locaties["prompts"].replace("<value-stream>", value_stream).replace("<agent-naam>", naam).replace("<werkwoord>", "*")))
         # runner
-        runner_tpl = get_template(locaties.get("runners"), value_stream)
-        if aantal_runners > 0 and runner_tpl:
-            files.append(Path(runner_tpl.replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
+        if aantal_runners > 0 and locaties.get("runners"):
+            files.append(Path(locaties["runners"].replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
 
         specs.append(
             AgentSpec(

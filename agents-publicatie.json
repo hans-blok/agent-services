@@ -1,6 +1,6 @@
 {
   "publicatiedatum": "2026-01-22",
-  "digest": "a6821",
+  "digest": "e0a45",
   "agents": [
     {
       "naam": "agent-curator",
@@ -57,6 +57,12 @@
       "aantalRunners": 1
     },
     {
+      "naam": "docker-steward",
+      "valueStream": "utility",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
       "naam": "essayist",
       "valueStream": "kennispublicatie",
       "aantalPrompts": 1,
@@ -66,6 +72,12 @@
       "naam": "heraut",
       "valueStream": "kennispublicatie",
       "aantalPrompts": 2,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "layout-optimizer",
+      "valueStream": "utility",
+      "aantalPrompts": 1,
       "aantalRunners": 0
     },
     {

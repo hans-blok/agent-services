@@ -278,8 +278,8 @@ def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[
 
 
 def write_fetch_log(workspace: Path, value_stream: str, meta: Dict[str, str], applicable: List[AgentSpec], stats: Dict[str, int], source_repo: str) -> Path:
-    """Write detailed fetch log to docs/logs/ folder."""
-    logs_dir = workspace / "docs" / "logs"
+    """Write detailed fetch log to logs/ folder."""
+    logs_dir = workspace / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
     
     log_timestamp = datetime.now()
