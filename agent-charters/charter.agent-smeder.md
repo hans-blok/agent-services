@@ -37,6 +37,7 @@ Belangrijk: de Agent Smeder **beslist niet of** een agent nodig is. De Agent Sme
    - **Governance wordt NIET benoemd in prompts** - dit is een concern van charters.
    - Prompts volstaan met verwijzing naar charter en runner.
    - Zorgt dat de **promptnaam volgt de conventie: `<agent-naam>-<werkwoord-gebiedende-wijs>.prompt.md`** (bijvoorbeeld "moeder-beheer-git.prompt.md", "essayist-schrijf-essay.prompt.md"), zodat direct duidelijk is welke agent wat doet.
+   - **Locatie prompts**: `exports/<value-stream>/prompts/` (voor value stream agents) of `.github/prompts/` (voor utility agents zoals agent-smeder zelf)
 
 3. **Charter opstellen (interne werking)**
    - Schrijft een charter conform `artefacten/0-governance/agent-charter-normering.md` (indien aanwezig in canon).
@@ -44,9 +45,12 @@ Belangrijk: de Agent Smeder **beslist niet of** een agent nodig is. De Agent Sme
    - Zorgt dat het charter traceerbaar is naar het prompt-contract.
    - **Charter bevat governance-verwijzing** naar `beleid-workspace.md` en canon repository.
    - Charter beschrijft interne werkwijze, kerntaken, grenzen - prompts doen dat niet.
+   - **Locatie charters**: `exports/<value-stream>/charters/` (voor value stream agents) of `agent-charters/` (voor utility agents zoals agent-smeder zelf)
 
 4. **Agent-skeleton neerzetten (structuur)**
-   - Zet de basisbestanden neer volgens de agent-standaard (prompt, charter, runner).
+   - Zet de basisbestanden neer volgens de agen:
+     - Value stream agents: `exports/<value-stream>/prompts/` en `exports/<value-stream>/charters/`
+     - Utility agents: `.github/prompts/` en `agent-charters/`-standaard (prompt, charter, runner).
    - Zorgt voor correcte locaties en naamgeving.
    - Zorgt dat de nieuwe agent geen publicatieformaten maakt (HTML/PDF is alleen voor Publisher).
 
@@ -108,14 +112,19 @@ Belangrijk: de Agent Smeder **beslist niet of** een agent nodig is. De Agent Sme
 ## Werkwijze
 
 ### Agent Smeder volgt 4 sequentiële stappen (Stap 1 → Stap 4)
-
-**Stap 1: Initiele agent neerzetten**
+met correcte locaties:
+  - Value stream agents: `exports/<value-stream>/prompts/`, `exports/<value-stream>/charters/`
+  - Utility agents: `.github/prompts/`, `agent-charters/`
+  - Runners (indien nodig): `scripts/runners/` (voor alle agent-types)
+- Check: Agent-naam, boundary scherp, locaties correct voor agent-type
 - Prompt: `.github/prompts/agent-smeder-1-initiele-agent.prompt.md`
 - Output: Agent skeleton (governance/rolbeschrijvingen/, .github/prompts/, scripts/)
+- Locatie: `exports/<value-stream>/prompts/` (value stream agents) of `.github/prompts/` (utility agents)
 - Check: Agent-naam, boundary scherp, locaties correct
 
 **Stap 2: Prompt-contract definiëren**
 - Prompt: `.github/prompts/agent-smeder-2-definieer-prompt.prompt.md`
+- Locatie: `exports/<value-stream>/charters/` (value stream agents) of `agent-charters/` (utility agents)
 - Output: Concrete prompt-contract met input/output/foutafhandeling
 - Check: Interface-only, geen interne stappen, consistent met boundary
 
@@ -126,19 +135,22 @@ Belangrijk: de Agent Smeder **beslist niet of** een agent nodig is. De Agent Sme
 
 **Stap 4: Runner implementeren (indien nodig)**
 - Prompt: `.github/prompts/agent-smeder-4-schrijf-runner.prompt.md`
-- Output: Runner-skelet in Python met CLI-parameters en validaties
-- Check: Minimaal, herhaalbaar, correct bestandsformaat
-
-### Bij een nieuwe agent (volgt Stap 1-4 in sequence)
-1. **Stap 1: Intake & skeleton**
-   - Ontvang: capability boundary van Agent Curator incl. voorstel skeleton, value stream alignment en administratie-beoordeling
-   - Output: Agent skeleton (3 bestanden + initiële structuur) gebaseerd op Agent Curator voorstel
-   - Check: Correcte locaties, naamgeving, alignment met skeleton voorstel
+- OutLocaties:
+     - Value stream agents: `exports/<value-stream>/prompts/`, `exports/<value-stream>/charters/`
+     - Utility agents: `.github/prompts/`, `agent-charters/`
+   - Check: Correcte locaties voor agent-type, naamgeving, alignment met skeleton voorstel
 
 2. **Stap 2: Contract ontwerpen**
    - Input: Agent skeleton van Stap 1
    - Definieer: verplichte/optionele input, vaste output bullets, foutafhandeling
-   - Output: Concrete prompt-contract
+   - Output: Concrete prompt-contract in correcte locatie (exports/<value-stream>/prompts/ of .github/prompts/)
+   - Check: Interface-only, consistent met boundary, juiste locatie
+
+3. **Stap 3: Charter schrijven**
+   - Input: Prompt-contract van Stap 2
+   - Schrijf: Volledig charter met verplichte secties
+   - Output: Charter conform agent-charter-normering in correcte locatie (exports/<value-stream>/charters/ of agent-charters/)
+   - Check: WEL/NIET expliciet, herleidbaar naar prompt, juiste locatie
    - Check: Interface-only, consistent met boundary
 
 3. **Stap 3: Charter schrijven**
