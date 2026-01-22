@@ -20,6 +20,7 @@ Traceability:
 """
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -223,6 +224,42 @@ def scan_all_agents(workspace_root: Path) -> List[AgentMetadata]:
     return agents
 
 
+def calculate_digest(agents: List[AgentMetadata]) -> str:
+    """Calculate 5-character SHA-256 digest of agents list for change tracking.
+    
+    Creates a deterministic hash based on agent names, value streams, and artifact counts.
+    Sorted by agent name to ensure consistent results.
+    
+    Args:
+        agents: List of agent metadata
+        
+    Returns:
+        First 5 characters of SHA-256 hash (hex format)
+    """
+    # Sort by name for deterministic results
+    sorted_agents = sorted(agents, key=lambda a: a.naam)
+    
+    # Create deterministic string representation
+    # Include all relevant fields that indicate agent state changes
+    agent_data = json.dumps(
+        [
+            {
+                "naam": agent.naam,
+                "valueStream": agent.value_stream,
+                "aantalPrompts": agent.aantal_prompts,
+                "aantalRunners": agent.aantal_runners
+            }
+            for agent in sorted_agents
+        ],
+        sort_keys=True,
+        ensure_ascii=False
+    )
+    
+    # Calculate SHA-256 and take first 5 characters
+    hash_obj = hashlib.sha256(agent_data.encode('utf-8'))
+    return hash_obj.hexdigest()[:5]
+
+
 def generate_json(agents: List[AgentMetadata], workspace_root: Path) -> Dict:
     """Generate JSON structure for agents-publicatie.json.
     
@@ -265,7 +302,7 @@ def generate_json(agents: List[AgentMetadata], workspace_root: Path) -> Dict:
     
     return {
         "publicatiedatum": datetime.now().strftime("%Y-%m-%d"),
-        "versie": "1.2",
+        "digest": calculate_digest(agents),
         "agents": agents_list,
         "valueStreams": value_streams,
         "locaties": locaties
@@ -289,6 +326,7 @@ def generate_markdown(agents: List[AgentMetadata], scope: str, filter_waarde: Op
     lines.append(f"# Agents Publicatie Overzicht\n\n")
     lines.append(f"**Publicatiedatum**: {datetime.now().strftime('%Y-%m-%d')}\n")
     lines.append(f"**Tijdstip**: {datetime.now().strftime('%H:%M:%S')}\n")
+    lines.append(f"**Digest**: {calculate_digest(agents)}\n")
     lines.append(f"**Scope**: {scope}\n")
     if filter_waarde:
         lines.append(f"**Filter**: {filter_waarde}\n")
@@ -322,6 +360,7 @@ def generate_markdown(agents: List[AgentMetadata], scope: str, filter_waarde: Op
     lines.append(f"  - `exports/*/prompts/` (value stream prompts)\n")
     lines.append(f"  - `scripts/runners/` (runners)\n")
     lines.append(f"- **Value stream bron**: Charter header (`**Value Stream**:` veld)\n")
+    lines.append(f"- **Digest**: 5-karakter SHA-256 hash van agents-lijst (gesorteerd) voor change-tracking\n")
     lines.append(f"- **Traceability**: Agent Curator charter, publiceer-agents-overzicht prompt\n")
     
     return "".join(lines)

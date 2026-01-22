@@ -1,6 +1,6 @@
 {
   "publicatiedatum": "2026-01-22",
-  "versie": "1.2",
+  "digest": "a6821",
   "agents": [
     {
       "naam": "agent-curator",
@@ -18,7 +18,7 @@
       "naam": "agent-smeder",
       "valueStream": "agent-enablement",
       "aantalPrompts": 3,
-      "aantalRunners": 0
+      "aantalRunners": 1
     },
     {
       "naam": "archimate-modelleur",
@@ -30,7 +30,7 @@
       "naam": "artikel-schrijver",
       "valueStream": "kennispublicatie",
       "aantalPrompts": 6,
-      "aantalRunners": 0
+      "aantalRunners": 1
     },
     {
       "naam": "bedrijfsarchitect",
@@ -54,13 +54,13 @@
       "naam": "de-schrijver",
       "valueStream": "kennispublicatie",
       "aantalPrompts": 0,
-      "aantalRunners": 0
+      "aantalRunners": 1
     },
     {
       "naam": "essayist",
       "valueStream": "kennispublicatie",
       "aantalPrompts": 1,
-      "aantalRunners": 0
+      "aantalRunners": 1
     },
     {
       "naam": "heraut",
@@ -77,13 +77,13 @@
     {
       "naam": "moeder",
       "valueStream": "utility",
-      "aantalPrompts": 6,
-      "aantalRunners": 1
+      "aantalPrompts": 11,
+      "aantalRunners": 2
     },
     {
       "naam": "pipeline-executor",
       "valueStream": "it-development",
-      "aantalPrompts": 0,
+      "aantalPrompts": 1,
       "aantalRunners": 1
     },
     {
@@ -95,14 +95,14 @@
     {
       "naam": "python-expert",
       "valueStream": "utility",
-      "aantalPrompts": 3,
-      "aantalRunners": 0
+      "aantalPrompts": 6,
+      "aantalRunners": 1
     },
     {
       "naam": "vertaler",
       "valueStream": "kennispublicatie",
       "aantalPrompts": 1,
-      "aantalRunners": 0
+      "aantalRunners": 1
     },
     {
       "naam": "workflow-architect",
