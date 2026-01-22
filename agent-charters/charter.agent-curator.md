@@ -53,8 +53,10 @@ De Agent Curator bewaakt daarbij:
 
 ### 4. Agents Overzicht Publiceren
 - Publiceert **bondig overzicht** van alle agents uit exports/ folders
-- Scant alle charters voor metadata (agent-naam, value stream, domein)
-- Scant exports/<value-stream>/prompts/ en runners/ folders voor aantallen
+- **Scant charter-headers** voor metadata (agent-naam, value stream, domein, agent-soort)
+- **Bron voor value stream**: `**Value Stream**:` metadata in charter-header (verplicht veld)
+- Scant exports/<value-stream>/prompts/ en scripts/runners/ folders voor aantallen
+- Valideert: charter-locatie komt overeen met value stream in header
 - Genereert twee outputs:
   - **JSON**: voor fetch scripts (gestructureerde data)
   - **Markdown**: voor documentatie (tabellen per value stream)
@@ -81,7 +83,11 @@ De Curator heeft geen specialisaties; het is een governance-agent met vaste admi
 ✓ Beoordeelt ecosysteem-consistentie per value stream  
 ✓ Genereert overzichten: value streams, agent-overzicht (intern), publicatie (extern)  
 ✓ Publiceert bondig agents-overzicht volgens template (Agent | Value Stream | Aantal prompts | Aantal runners)  
-✓ Scant exports/ folders voor charters, prompts en runners  
+✓ **Leest value stream uit charter-header** (`**Value Stream**:` veld is leidend voor toewijzing)  
+✓ Scant exports/ folders en agent-charters/ voor charters  
+✓ Scant exports/<value-stream>/prompts/ voor prompts per agent  
+✓ Scant scripts/runners/ voor runners per agent  
+✓ Valideert charter-locatie tegen value stream uit header  
 ✓ Gebruikt templates/agents-publicatie-template.md voor publicaties  
 ✓ Identificeert administratieve hiaten en agents zonder geldige stream  
 ✓ Escaleert onduidelijkheid naar governance  
@@ -132,14 +138,22 @@ De Curator heeft geen specialisaties; het is een governance-agent met vaste admi
 
 ### Agents Overzicht Publiceren
 1. Ontvang scope (volledig/value-stream/agent-soort) + conditionele filter-waarde
-2. Scan alle exports/<value-stream>/charters-agents/ voor agent charters
-3. Lees charter-metadata: agent-naam, value stream, domein
+2. **Scan charter-headers** voor metadata:
+   - Zoek naar alle charter bestanden in relevante locaties
+   - **Lees `**Value Stream**:` uit charter-header** (verplicht veld, regel 4-5)
+   - Lees `**Agent**:`, `**Domein**:`, `**Agent-soort**:` uit header
+   - **Value stream is leidend** voor toewijzing aan juiste groep
+3. Valideer charter-locatie tegen value stream uit header:
+   - agent-enablement/utility: verwacht in `agent-charters/`
+   - Andere streams: verwacht in `exports/<value-stream>/charters/` of `exports/<value-stream>/charters-agents/`
+   - Waarschuw bij mismatch tussen locatie en header-value-stream
 4. Scan exports/<value-stream>/prompts/ voor prompts per agent (matching op agent-naam prefix)
-5. Scan exports/<value-stream>/runners/ voor runners per agent (matching op agent-naam)
-6. Verzamel per agent: agent-naam, value stream, aantal prompts, aantal runners
+5. Scan scripts/runners/ voor runners per agent (matching op agent-naam)
+6. Verzamel per agent: agent-naam, **value stream (uit header)**, aantal prompts, aantal runners
 7. Filter op basis van scope (volledig, specifieke stream, specifieke soort)
 8. Sorteer alfabetisch op agent-naam voor publicatie
 9. Genereer **JSON-structuur**: {publicatiedatum, versie, agents[], valueStreams[], locaties{}}
+   - Per agent: naam, **valueStream (uit charter-header)**, aantalPrompts, aantalRunners
 10. Genereer **Markdown-tabellen**: gegroepeerd per value stream met samenvatting
 11. Opslaan **root-publicatie**: `agents-publicatie.json` (JSON voor fetch scripts, zonder datum)
 12. Opslaan **archief-versie**: `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (markdown met metadata)
@@ -174,7 +188,8 @@ Geen meta-commentaar, geen persoonlijke interpretatie, geen strategisch advies b
 Alle boundaries, value stream toewijzingen, ecosysteem-analyses en publicaties zijn traceerbaar:
 - Value streams: geregistreerd in `docs/resultaten/agent-curator/value-streams-overzicht.md`
 - Boundaries: opgeslagen in `docs/resultaten/agent-curator/agent-boundary-<agent-naam>.md`
-- Ecosysteem-analyses: gearchiveerd per datum in `docs/resultaten/agent-curator/agent-ecosystem-analyse-<datum>.md`
+- Ecosyste22 | 0.4.4 | Charter-header is bron voor value stream: `**Value Stream**:` veld leidend, validatie locatie tegen header | Agent Smeder |
+| 2026-01-em-analyses: gearchiveerd per datum in `docs/resultaten/agent-curator/agent-ecosystem-analyse-<datum>.md`
 - Archief-overzichten: opgeslagen in `docs/resultaten/agent-publicaties/agents-publicatie-<datum>.md` (markdown met metadata)
 - Root-publicatie: opgeslagen in `agents-publicatie.json` (JSON voor fetch scripts, zonder datum)
 - Referentie naar vastgestelde governance: vermelding van bronnen in elk rapport

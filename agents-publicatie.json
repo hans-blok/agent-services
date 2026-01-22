@@ -1,11 +1,17 @@
 {
   "publicatiedatum": "2026-01-22",
-  "versie": "1.1",
+  "versie": "1.2",
   "agents": [
     {
       "naam": "agent-curator",
       "valueStream": "agent-enablement",
       "aantalPrompts": 4,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "agent-publisher",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
       "aantalRunners": 0
     },
     {
@@ -15,19 +21,120 @@
       "aantalRunners": 0
     },
     {
-      "naam": "moeder",
-      "valueStream": "agent-enablement",
-      "aantalPrompts": 6,
-      "aantalRunners": 1
-    },
-    {
       "naam": "archimate-modelleur",
       "valueStream": "architectuur-en-oplossingsontwerp",
       "aantalPrompts": 2,
       "aantalRunners": 0
     },
     {
+      "naam": "artikel-schrijver",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 6,
+      "aantalRunners": 0
+    },
+    {
       "naam": "bedrijfsarchitect",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 0,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "c4-modelleur",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 2,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "converter-md-to-archimate",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "de-schrijver",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 0,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "essayist",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "heraut",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 2,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "mandarin-ea",
+      "valueStream": "ondernemingsvorming",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "moeder",
+      "valueStream": "utility",
+      "aantalPrompts": 6,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "pipeline-executor",
+      "valueStream": "it-development",
+      "aantalPrompts": 0,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "presentatie-architect",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "python-expert",
+      "valueStream": "utility",
+      "aantalPrompts": 3,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "vertaler",
+      "valueStream": "kennispublicatie",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "workflow-architect",
+      "valueStream": "it-development",
+      "aantalPrompts": 3,
+      "aantalRunners": 1
+    }
+  ],
+  "valueStreams": [
+    "agent-enablement",
+    "architectuur-en-oplossingsontwerp",
+    "it-development",
+    "kennispublicatie",
+    "ondernemingsvorming",
+    "utility"
+  ],
+  "locaties": {
+    "charters": {
+      "agent-enablement": "agent-charters/charter.<agent-naam>.md",
+      "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/charters/charter.<agent-naam>.md",
+      "utility": "exports/utility/charters-agents/charter.<agent-naam>.md",
+      "default": "exports/<value-stream>/charters-agents/charter.<agent-naam>.md"
+    },
+    "prompts": {
+      "agent-enablement": ".github/prompts/<agent-naam>-<werkwoord>.prompt.md",
+      "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/prompts/<agent-naam>-<werkwoord>.prompt.md",
+      "utility": "exports/utility/prompts/<agent-naam>-<werkwoord>.prompt.md",
+      "default": "exports/<value-stream>/prompts/<agent-naam>-<werkwoord>.prompt.md"
+    },
+    "runners": "scripts/runners/<agent-naam>.py"
+  }
+}
       "valueStream": "architectuur-en-oplossingsontwerp",
       "aantalPrompts": 0,
       "aantalRunners": 0
@@ -118,7 +225,7 @@
     }
   ],
   "valueStreams": [
-    "agent-enablement",
+    "utility",
     "architectuur-en-oplossingsontwerp",
     "it-development",
     "kennispublicatie",
@@ -127,12 +234,12 @@
   ],
   "locaties": {
     "charters": {
-      "agent-enablement": "agent-charters/charter.<agent-naam>.md",
+      "utility": "agent-charters/charter.<agent-naam>.md",
       "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/charters/charter.<agent-naam>.md",
       "default": "exports/<value-stream>/charters-agents/charter.<agent-naam>.md"
     },
     "prompts": {
-      "agent-enablement": ".github/prompts/<agent-naam>-<werkwoord>.prompt.md",
+      "utility": ".github/prompts/<agent-naam>-<werkwoord>.prompt.md",
       "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/prompts/<agent-naam>-<werkwoord>.prompt.md",
       "default": "exports/<value-stream>/prompts/<agent-naam>-<werkwoord>.prompt.md"
     },
