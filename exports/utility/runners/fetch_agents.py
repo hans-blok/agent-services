@@ -46,46 +46,50 @@ class AgentSpec:
         return value_stream in self.value_streams or "*" in self.value_streams
 
 
-def run_command(cmd: List[str], cwd: Path | None = None, timeout: int = 300) -> str:
-    """Run command with timeout and sanitized error messages.
-    
-    Args:
-        cmd: Command and arguments to execute
-        cwd: Working directory for command
-        timeout: Maximum execution time in seconds (default: 300)
-    
-    Returns:
-        Command stdout output
-    
-    Raises:
-        RuntimeError: If command fails or times out
-    """
-    try:
-        result = subprocess.run(
-            cmd, 
-            cwd=cwd, 
-            text=True, 
-            capture_output=True,
-            timeout=timeout
-        )
-    except subprocess.TimeoutExpired:
-        raise RuntimeError(f"Command timed out after {timeout}s: {cmd[0]}")
-    
+def run_command(cmd: List[str], cwd: Path | None = None) -> str:
+    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
     if result.returncode != 0:
-        # Sanitize potential credentials from error message
-        safe_cmd = ' '.join(cmd)
-        if '@' in safe_cmd:
-            # Remove credentials from git URLs
-            safe_cmd = safe_cmd.split('@')[-1]
-        raise RuntimeError(f"Command failed: {safe_cmd}\n{result.stderr}")
-    
+        raise RuntimeError(f"Command failed: {' '.join(cmd)}\n{result.stderr}")
     return result.stdout.strip()
 
 
 def fetch_repo(repo_url: str, temp_dir: Path) -> Path:
+    """Clone or pull agent-services repository.
+    
+    Als de repository al bestaat in temp_dir/agent-services, wordt een git pull gedaan.
+    Anders wordt de repository ge-cloned.
+    
+    Dit zorgt ervoor dat altijd de laatste versie wordt opgehaald.
+    """
     clone_path = temp_dir / "agent-services"
-    run_command(["git", "clone", "--depth", "1", repo_url, str(clone_path)])
+    
+    if clone_path.exists() and (clone_path / ".git").exists():
+        # Repository bestaat al - doe een pull
+        print(f"[INFO] Repository bestaat al, pulling latest changes...")
+        try:
+            run_command(["git", "pull"], cwd=clone_path)
+            print(f"[INFO] Pull completed successfully")
+        except RuntimeError as e:
+            # Als pull faalt, verwijder de folder en clone opnieuw
+            print(f"[WARN] Pull failed, re-cloning: {e}")
+            shutil.rmtree(clone_path)
+            run_command(["git", "clone", "--depth", "1", repo_url, str(clone_path)])
+    else:
+        # Repository bestaat nog niet - clone
+        print(f"[INFO] Cloning repository...")
+        run_command(["git", "clone", "--depth", "1", repo_url, str(clone_path)])
+    
     return clone_path
+
+
+def get_template(loc_dict, vs: str) -> str | None:
+    """Get location template for value stream, with fallback to default."""
+    if isinstance(loc_dict, str):
+        return loc_dict  # Old format: single string template
+    if isinstance(loc_dict, dict):
+        # New format: per-value-stream dict with optional default
+        return loc_dict.get(vs) or loc_dict.get("default")
+    return None
 
 
 def load_manifest(repo_path: Path, manifest_name: str) -> Tuple[List[AgentSpec], Dict[str, str], Dict[str, str]]:
@@ -111,14 +115,17 @@ def load_manifest(repo_path: Path, manifest_name: str) -> Tuple[List[AgentSpec],
         agent_type = "utility" if value_stream.lower() == "utility" else "value-stream"
         files: List[Path] = []
         # charter
-        if locaties.get("charters"):
-            files.append(Path(locaties["charters"].replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
+        charter_tpl = get_template(locaties.get("charters"), value_stream)
+        if charter_tpl:
+            files.append(Path(charter_tpl.replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
         # prompts (wildcard)
-        if aantal_prompts > 0 and locaties.get("prompts"):
-            files.append(Path(locaties["prompts"].replace("<value-stream>", value_stream).replace("<agent-naam>", naam).replace("<werkwoord>", "*")))
+        prompts_tpl = get_template(locaties.get("prompts"), value_stream)
+        if aantal_prompts > 0 and prompts_tpl:
+            files.append(Path(prompts_tpl.replace("<value-stream>", value_stream).replace("<agent-naam>", naam).replace("<werkwoord>", "*")))
         # runner
-        if aantal_runners > 0 and locaties.get("runners"):
-            files.append(Path(locaties["runners"].replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
+        runner_tpl = get_template(locaties.get("runners"), value_stream)
+        if aantal_runners > 0 and runner_tpl:
+            files.append(Path(runner_tpl.replace("<value-stream>", value_stream).replace("<agent-naam>", naam)))
 
         specs.append(
             AgentSpec(
@@ -217,59 +224,6 @@ def _copy_file(src: Path, dest: Path) -> str:
         return "error"
 
 
-def _safe_replace_module(src: Path, dst: Path) -> None:
-    """Safely replace module with backup and rollback.
-    
-    Args:
-        src: Source module directory
-        dst: Destination module directory
-    
-    Raises:
-        RuntimeError: If module replacement fails
-    """
-    backup = None
-    
-    if dst.exists():
-        # Create backup with timestamp to avoid conflicts
-        backup = dst.with_name(f"{dst.name}.backup")
-        if backup.exists():
-            shutil.rmtree(backup)
-        try:
-            shutil.move(str(dst), str(backup))
-        except (PermissionError, OSError) as e:
-            raise RuntimeError(
-                f"Cannot backup existing module {dst.name}: {e}\n"
-                f"Tip: Close programs using these files."
-            )
-    
-    try:
-        shutil.copytree(src, dst)
-        
-        # Validate module has __init__.py
-        if not (dst / "__init__.py").exists():
-            raise ValueError(f"Module {dst.name} has no __init__.py")
-        
-        # Success - remove backup
-        if backup and backup.exists():
-            shutil.rmtree(backup)
-            
-    except Exception as e:
-        # Rollback on any error
-        if dst.exists():
-            try:
-                shutil.rmtree(dst)
-            except Exception:
-                pass  # Best effort cleanup
-        
-        if backup and backup.exists():
-            try:
-                shutil.move(str(backup), str(dst))
-            except Exception:
-                pass  # Best effort restore
-        
-        raise RuntimeError(f"Failed to replace module {dst.name}: {e}")
-
-
 def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[Path], workspace: Path, repo_path: Path) -> Dict[str, int]:
     """Organize files into workspace. Runner modules are replaced entirely."""
     prompts_dir = workspace / ".github" / "prompts"
@@ -293,16 +247,19 @@ def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[
             # Als workspace-folder 2 files heeft en agent-services 1 file,
             # blijven na fetch alleen het 1 file uit agent-services over.
             if module_dst.exists():
-                print(f"  [REPLACE] Safely replacing {module_name}/ (with backup)")
+                print(f"  [REPLACE] Removing existing {module_name}/ before copy")
+                shutil.rmtree(module_dst)
             
-            # Use safe replacement with backup and rollback
-            _safe_replace_module(module_src, module_dst)
+            # Copy entire module
+            shutil.copytree(module_src, module_dst)
             print(f"  [MODULE] {module_name}/ -> {module_dst.relative_to(workspace)}")
             stats["modules_replaced"] += 1
+            
+            # Validate __init__.py exists
+            init_file = module_dst / "__init__.py"
+            if not init_file.exists():
+                print(f"  [WARNING] Runner module {module_name}/ has no __init__.py")
                 
-        except RuntimeError as e:
-            print(f"  [ERROR] {e}")
-            stats["error"] += 1
         except Exception as e:
             print(f"  [ERROR] Failed to replace module {module_name}: {e}")
             stats["error"] += 1
@@ -391,7 +348,7 @@ def write_fetch_log(workspace: Path, value_stream: str, meta: Dict[str, str], ap
 
 def sync_self_script(repo_path: Path, workspace: Path) -> str:
     """Update the local fetch_agents.py from the source repo if available."""
-    src = repo_path / "scripts" / "fetch_agents.py"
+    src = repo_path / "exports" / "fetch_agents.py"
     dest = workspace / "scripts" / "fetch_agents.py"
 
     if not src.exists():
@@ -424,11 +381,12 @@ def main() -> int:
     value_stream = args.value_stream.strip("'\"") if args.value_stream else None
     workspace = Path(os.getcwd())
 
-    tmp_ctx = tempfile.TemporaryDirectory()
-    tmp_dir = Path(tmp_ctx.name)
+    # Gebruik persistente agent-services folder in workspace root voor git pull functionaliteit
+    agent_services_dir = workspace / "agent-services"
+    agent_services_dir.mkdir(exist_ok=True)
 
     try:
-        repo = fetch_repo(args.source_repo, tmp_dir)
+        repo = fetch_repo(args.source_repo, agent_services_dir.parent)
         specs, meta, _loc = load_manifest(repo, args.manifest)
         streams = derive_streams(specs)
 
@@ -490,11 +448,6 @@ def main() -> int:
     except Exception as e:
         print(f"[ERROR] {e}")
         return 1
-    finally:
-        if not args.no_cleanup:
-            tmp_ctx.cleanup()
-        else:
-            print(f"[DEBUG] Temp dir retained: {tmp_dir}")
 
 
 if __name__ == "__main__":

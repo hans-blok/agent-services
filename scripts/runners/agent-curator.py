@@ -24,7 +24,7 @@ import json
 import re
 import sys
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -37,7 +37,7 @@ class AgentMetadata:
     value_stream: str
     domein: str = ""
     agent_soort: str = ""
-    charter_path: Path = None
+    charter_path: Optional[Path] = None
     aantal_prompts: int = 0
     aantal_runners: int = 0
 
@@ -46,6 +46,13 @@ def extract_header_field(content: str, field_name: str) -> str:
     """Extract a field value from charter header.
     
     Looks for pattern: **FieldName**: value
+    
+    Args:
+        content: Charter file content
+        field_name: Name of the header field to extract
+        
+    Returns:
+        Extracted field value, empty string if not found
     """
     pattern = rf"\*\*{re.escape(field_name)}\*\*:\s*(.+?)(?:\n|$)"
     match = re.search(pattern, content, re.IGNORECASE)
@@ -53,7 +60,14 @@ def extract_header_field(content: str, field_name: str) -> str:
 
 
 def scan_charter(charter_path: Path) -> Optional[AgentMetadata]:
-    """Scan a charter file and extract metadata from header."""
+    """Scan a charter file and extract metadata from header.
+    
+    Args:
+        charter_path: Path to charter file
+        
+    Returns:
+        AgentMetadata if successful, None if charter is invalid or missing required fields
+    """
     try:
         content = charter_path.read_text(encoding="utf-8")
         
@@ -76,98 +90,149 @@ def scan_charter(charter_path: Path) -> Optional[AgentMetadata]:
             agent_soort=agent_soort,
             charter_path=charter_path
         )
+    except UnicodeDecodeError as e:
+        print(f"[ERROR] Encoding error in charter {charter_path}: {e}")
+        return None
+    except OSError as e:
+        print(f"[ERROR] Failed to read charter {charter_path}: {e}")
+        return None
     except Exception as e:
-        print(f"[ERROR] Failed to scan charter {charter_path}: {e}")
+        print(f"[ERROR] Unexpected error scanning charter {charter_path}: {e}")
         return None
 
 
 def count_prompts(agent_naam: str, workspace_root: Path) -> int:
-    """Count prompts for an agent by scanning .github/prompts/ and exports/."""
+    """Count prompts for an agent by scanning .github/prompts/ and exports/.
+    
+    Args:
+        agent_naam: Name of the agent
+        workspace_root: Root directory of workspace
+        
+    Returns:
+        Total number of prompts found for this agent
+    """
     count = 0
     
-    # Scan .github/prompts/
-    prompts_dir = workspace_root / ".github" / "prompts"
-    if prompts_dir.exists():
-        pattern = f"{agent_naam}-*.prompt.md"
-        count += len(list(prompts_dir.glob(pattern)))
-    
-    # Scan exports/*/prompts/
-    exports_dir = workspace_root / "exports"
-    if exports_dir.exists():
-        for value_stream_dir in exports_dir.iterdir():
-            if value_stream_dir.is_dir():
-                vs_prompts = value_stream_dir / "prompts"
-                if vs_prompts.exists():
-                    pattern = f"{agent_naam}-*.prompt.md"
-                    count += len(list(vs_prompts.glob(pattern)))
+    try:
+        # Scan .github/prompts/
+        prompts_dir = workspace_root / ".github" / "prompts"
+        if prompts_dir.exists() and prompts_dir.is_dir():
+            pattern = f"{agent_naam}-*.prompt.md"
+            count += len(list(prompts_dir.glob(pattern)))
+        
+        # Scan exports/*/prompts/
+        exports_dir = workspace_root / "exports"
+        if exports_dir.exists() and exports_dir.is_dir():
+            for value_stream_dir in exports_dir.iterdir():
+                if value_stream_dir.is_dir():
+                    vs_prompts = value_stream_dir / "prompts"
+                    if vs_prompts.exists() and vs_prompts.is_dir():
+                        pattern = f"{agent_naam}-*.prompt.md"
+                        count += len(list(vs_prompts.glob(pattern)))
+    except OSError as e:
+        print(f"[WARN] Error scanning prompts for {agent_naam}: {e}")
     
     return count
 
 
 def count_runners(agent_naam: str, workspace_root: Path) -> int:
-    """Count runners for an agent by scanning scripts/runners/."""
-    runners_dir = workspace_root / "scripts" / "runners"
-    if not runners_dir.exists():
+    """Count runners for an agent by scanning scripts/runners/.
+    
+    Args:
+        agent_naam: Name of the agent
+        workspace_root: Root directory of workspace
+        
+    Returns:
+        Total number of runners found for this agent (script + module = max 2)
+    """
+    try:
+        runners_dir = workspace_root / "scripts" / "runners"
+        if not runners_dir.exists() or not runners_dir.is_dir():
+            return 0
+        
+        count = 0
+        
+        # Individual runner script
+        runner_file = runners_dir / f"{agent_naam}.py"
+        if runner_file.exists() and runner_file.is_file():
+            count += 1
+        
+        # Runner module folder
+        runner_module = runners_dir / agent_naam
+        if runner_module.exists() and runner_module.is_dir():
+            # Verify it's a valid Python module (has __init__.py)
+            init_file = runner_module / "__init__.py"
+            if init_file.exists():
+                count += 1
+        
+        return count
+    except OSError as e:
+        print(f"[WARN] Error scanning runners for {agent_naam}: {e}")
         return 0
-    
-    count = 0
-    
-    # Individual runner script
-    runner_file = runners_dir / f"{agent_naam}.py"
-    if runner_file.exists():
-        count += 1
-    
-    # Runner module folder
-    runner_module = runners_dir / agent_naam
-    if runner_module.exists() and runner_module.is_dir():
-        count += 1
-    
-    return count
 
 
 def scan_all_agents(workspace_root: Path) -> List[AgentMetadata]:
-    """Scan all charters in agent-charters/ and exports/."""
+    """Scan all charters in agent-charters/ and exports/.
+    
+    Args:
+        workspace_root: Root directory of workspace
+        
+    Returns:
+        List of AgentMetadata for all discovered agents
+    """
     agents = []
+    scanned_names = set()  # Track duplicates
     
-    # Scan agent-charters/ (utility and agent-enablement)
-    charters_dir = workspace_root / "agent-charters"
-    if charters_dir.exists():
-        for charter_file in charters_dir.glob("charter.*.md"):
-            if charter_file.name == "charter-moeder.md":
-                # Handle legacy naming
-                charter_file_alt = charters_dir / "charter.moeder.md"
-                if charter_file_alt.exists():
-                    charter_file = charter_file_alt
-            
-            metadata = scan_charter(charter_file)
-            if metadata:
-                metadata.aantal_prompts = count_prompts(metadata.naam, workspace_root)
-                metadata.aantal_runners = count_runners(metadata.naam, workspace_root)
-                agents.append(metadata)
-    
-    # Scan exports/*/charters/ and exports/*/charters-agents/
-    exports_dir = workspace_root / "exports"
-    if exports_dir.exists():
-        for value_stream_dir in exports_dir.iterdir():
-            if not value_stream_dir.is_dir():
-                continue
-            
-            # Try both charters/ and charters-agents/
-            for charter_subdir in ["charters", "charters-agents"]:
-                charters_vs = value_stream_dir / charter_subdir
-                if charters_vs.exists():
-                    for charter_file in charters_vs.glob("charter.*.md"):
-                        metadata = scan_charter(charter_file)
-                        if metadata:
-                            metadata.aantal_prompts = count_prompts(metadata.naam, workspace_root)
-                            metadata.aantal_runners = count_runners(metadata.naam, workspace_root)
-                            agents.append(metadata)
+    try:
+        # Scan agent-charters/ (agent-enablement agents)
+        charters_dir = workspace_root / "agent-charters"
+        if charters_dir.exists() and charters_dir.is_dir():
+            for charter_file in charters_dir.glob("charter.*.md"):
+                metadata = scan_charter(charter_file)
+                if metadata and metadata.naam not in scanned_names:
+                    metadata.aantal_prompts = count_prompts(metadata.naam, workspace_root)
+                    metadata.aantal_runners = count_runners(metadata.naam, workspace_root)
+                    agents.append(metadata)
+                    scanned_names.add(metadata.naam)
+                elif metadata and metadata.naam in scanned_names:
+                    print(f"[WARN] Duplicate agent found: {metadata.naam} in {charter_file}")
+        
+        # Scan exports/*/charters/ and exports/*/charters-agents/
+        exports_dir = workspace_root / "exports"
+        if exports_dir.exists() and exports_dir.is_dir():
+            for value_stream_dir in exports_dir.iterdir():
+                if not value_stream_dir.is_dir():
+                    continue
+                
+                # Try both charters/ and charters-agents/
+                for charter_subdir in ["charters", "charters-agents"]:
+                    charters_vs = value_stream_dir / charter_subdir
+                    if charters_vs.exists() and charters_vs.is_dir():
+                        for charter_file in charters_vs.glob("charter.*.md"):
+                            metadata = scan_charter(charter_file)
+                            if metadata and metadata.naam not in scanned_names:
+                                metadata.aantal_prompts = count_prompts(metadata.naam, workspace_root)
+                                metadata.aantal_runners = count_runners(metadata.naam, workspace_root)
+                                agents.append(metadata)
+                                scanned_names.add(metadata.naam)
+                            elif metadata and metadata.naam in scanned_names:
+                                print(f"[WARN] Duplicate agent found: {metadata.naam} in {charter_file}")
+    except OSError as e:
+        print(f"[ERROR] Error scanning agents: {e}")
     
     return agents
 
 
 def generate_json(agents: List[AgentMetadata], workspace_root: Path) -> Dict:
-    """Generate JSON structure for agents-publicatie.json."""
+    """Generate JSON structure for agents-publicatie.json.
+    
+    Args:
+        agents: List of agent metadata
+        workspace_root: Root directory of workspace
+        
+    Returns:
+        Dictionary with complete publication structure
+    """
     # Collect unique value streams
     value_streams = sorted(set(agent.value_stream for agent in agents))
     
@@ -186,11 +251,13 @@ def generate_json(agents: List[AgentMetadata], workspace_root: Path) -> Dict:
         "charters": {
             "agent-enablement": "agent-charters/charter.<agent-naam>.md",
             "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/charters/charter.<agent-naam>.md",
+            "utility": "exports/utility/charters-agents/charter.<agent-naam>.md",
             "default": "exports/<value-stream>/charters-agents/charter.<agent-naam>.md"
         },
         "prompts": {
             "agent-enablement": ".github/prompts/<agent-naam>-<werkwoord>.prompt.md",
             "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/prompts/<agent-naam>-<werkwoord>.prompt.md",
+            "utility": "exports/utility/prompts/<agent-naam>-<werkwoord>.prompt.md",
             "default": "exports/<value-stream>/prompts/<agent-naam>-<werkwoord>.prompt.md"
         },
         "runners": "scripts/runners/<agent-naam>.py"
@@ -198,7 +265,7 @@ def generate_json(agents: List[AgentMetadata], workspace_root: Path) -> Dict:
     
     return {
         "publicatiedatum": datetime.now().strftime("%Y-%m-%d"),
-        "versie": "1.1",
+        "versie": "1.2",
         "agents": agents_list,
         "valueStreams": value_streams,
         "locaties": locaties
@@ -206,7 +273,16 @@ def generate_json(agents: List[AgentMetadata], workspace_root: Path) -> Dict:
 
 
 def generate_markdown(agents: List[AgentMetadata], scope: str, filter_waarde: Optional[str] = None) -> str:
-    """Generate Markdown archive with full metadata."""
+    """Generate Markdown archive with full metadata.
+    
+    Args:
+        agents: List of agent metadata
+        scope: Publication scope (volledig, value-stream, agent-soort)
+        filter_waarde: Optional filter value for scoped publications
+        
+    Returns:
+        Markdown content as string
+    """
     lines = []
     
     # Header
@@ -251,37 +327,70 @@ def generate_markdown(agents: List[AgentMetadata], scope: str, filter_waarde: Op
     return "".join(lines)
 
 
-def write_outputs(json_data: Dict, markdown_content: str, workspace_root: Path, scope: str, filter_waarde: Optional[str] = None):
-    """Write JSON and Markdown outputs."""
-    # Write JSON to root (only for volledig scope)
-    if scope == "volledig":
-        json_path = workspace_root / "agents-publicatie.json"
-        json_path.write_text(json.dumps(json_data, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"[JSON] {json_path.relative_to(workspace_root)}")
+def write_outputs(
+    json_data: Dict,
+    markdown_content: str,
+    workspace_root: Path,
+    scope: str,
+    filter_waarde: Optional[str] = None
+) -> None:
+    """Write JSON and Markdown outputs.
     
-    # Write Markdown to archive
-    archive_dir = workspace_root / "docs" / "resultaten" / "agent-publicaties"
-    archive_dir.mkdir(parents=True, exist_ok=True)
-    
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    if scope == "volledig":
-        md_filename = f"agents-publicatie-{timestamp}.md"
-    elif scope == "value-stream":
-        md_filename = f"agents-publicatie-{filter_waarde}-{timestamp}.md"
-    elif scope == "agent-soort":
-        md_filename = f"agents-publicatie-{filter_waarde}-{timestamp}.md"
-    else:
-        md_filename = f"agents-publicatie-{scope}-{timestamp}.md"
-    
-    md_path = archive_dir / md_filename
-    md_path.write_text(markdown_content, encoding="utf-8")
-    print(f"[MARKDOWN] {md_path.relative_to(workspace_root)}")
+    Args:
+        json_data: JSON publication data
+        markdown_content: Markdown archive content
+        workspace_root: Root directory of workspace
+        scope: Publication scope
+        filter_waarde: Optional filter value
+        
+    Raises:
+        OSError: If file writing fails
+    """
+    try:
+        # Write JSON to root (only for volledig scope)
+        if scope == "volledig":
+            json_path = workspace_root / "agents-publicatie.json"
+            json_content = json.dumps(json_data, indent=2, ensure_ascii=False)
+            json_path.write_text(json_content, encoding="utf-8")
+            print(f"[JSON] {json_path.relative_to(workspace_root)}")
+        
+        # Write Markdown to archive
+        archive_dir = workspace_root / "docs" / "resultaten" / "agent-publicaties"
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        if scope == "volledig":
+            md_filename = f"agents-publicatie-{timestamp}.md"
+        elif scope == "value-stream" and filter_waarde:
+            md_filename = f"agents-publicatie-{filter_waarde}-{timestamp}.md"
+        elif scope == "agent-soort" and filter_waarde:
+            md_filename = f"agents-publicatie-{filter_waarde}-{timestamp}.md"
+        else:
+            md_filename = f"agents-publicatie-{scope}-{timestamp}.md"
+        
+        md_path = archive_dir / md_filename
+        md_path.write_text(markdown_content, encoding="utf-8")
+        print(f"[MARKDOWN] {md_path.relative_to(workspace_root)}")
+    except OSError as e:
+        print(f"[ERROR] Failed to write output files: {e}", file=sys.stderr)
+        raise
 
 
-def main():
-    """Main entry point for Agent Curator runner."""
+def main() -> int:
+    """Main entry point for Agent Curator runner.
+    
+    Returns:
+        Exit code (0 for success, 1 for error)
+    """
     parser = argparse.ArgumentParser(
-        description="Agent Curator — Publiceer Agents Overzicht"
+        description="Agent Curator — Publiceer Agents Overzicht",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s --scope volledig
+  %(prog)s --scope value-stream --filter kennispublicatie
+  %(prog)s --scope agent-soort --filter "Uitvoerend Agent"
+        """
     )
     parser.add_argument(
         "--scope",
@@ -297,7 +406,7 @@ def main():
     parser.add_argument(
         "--include-drafts",
         action="store_true",
-        help="Include agents in draft status"
+        help="Include agents in draft status (not yet implemented)"
     )
     
     args = parser.parse_args()
@@ -316,34 +425,46 @@ def main():
         print(f"Filter: {args.filter_waarde}")
     print()
     
-    # Scan all agents
-    print("[INFO] Scanning agent charters...")
-    all_agents = scan_all_agents(workspace_root)
-    print(f"[INFO] Found {len(all_agents)} agents")
-    
-    # Filter based on scope
-    if args.scope == "value-stream":
-        agents = [a for a in all_agents if a.value_stream == args.filter_waarde]
-        if not agents:
-            print(f"[WARN] No agents found for value stream '{args.filter_waarde}'")
-    elif args.scope == "agent-soort":
-        agents = [a for a in all_agents if a.agent_soort == args.filter_waarde]
-        if not agents:
-            print(f"[WARN] No agents found for agent-soort '{args.filter_waarde}'")
-    else:
-        agents = all_agents
-    
-    print(f"[INFO] Publishing {len(agents)} agents")
-    
-    # Generate outputs
-    json_data = generate_json(agents, workspace_root)
-    markdown_content = generate_markdown(agents, args.scope, args.filter_waarde)
-    
-    # Write outputs
-    write_outputs(json_data, markdown_content, workspace_root, args.scope, args.filter_waarde)
-    
-    print("\n[SUCCESS] Agents overzicht gepubliceerd")
-    return 0
+    try:
+        # Scan all agents
+        print("[INFO] Scanning agent charters...")
+        all_agents = scan_all_agents(workspace_root)
+        
+        if not all_agents:
+            print("[ERROR] No agents found", file=sys.stderr)
+            return 1
+        
+        print(f"[INFO] Found {len(all_agents)} agents")
+        
+        # Filter based on scope
+        if args.scope == "value-stream":
+            agents = [a for a in all_agents if a.value_stream == args.filter_waarde]
+            if not agents:
+                print(f"[WARN] No agents found for value stream '{args.filter_waarde}'")
+                return 1
+        elif args.scope == "agent-soort":
+            agents = [a for a in all_agents if a.agent_soort == args.filter_waarde]
+            if not agents:
+                print(f"[WARN] No agents found for agent-soort '{args.filter_waarde}'")
+                return 1
+        else:
+            agents = all_agents
+        
+        print(f"[INFO] Publishing {len(agents)} agents")
+        
+        # Generate outputs
+        json_data = generate_json(agents, workspace_root)
+        markdown_content = generate_markdown(agents, args.scope, args.filter_waarde)
+        
+        # Write outputs
+        write_outputs(json_data, markdown_content, workspace_root, args.scope, args.filter_waarde)
+        
+        print("\n[SUCCESS] Agents overzicht gepubliceerd")
+        return 0
+        
+    except Exception as e:
+        print(f"\n[ERROR] Unexpected error: {e}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
