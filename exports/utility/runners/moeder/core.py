@@ -337,8 +337,8 @@ def op_fetch_agents(
 ) -> OperationResult:
     """Operatie: fetch-agents
     
-    Haalt agents op uit agent-services repository en installeert in workspace.
-    Leest agents-publicatie.json om beschikbare agents te bepalen.
+    Haalt agents op uit agent-services repository door te delegeren naar fetch_agents.py.
+    Dit voorkomt code duplicatie en garandeert consistente werking.
     
     BELANGRIJK - Overschrijfgedrag:
     - Charters: Volledig overschreven met versie uit agent-services
@@ -348,210 +348,76 @@ def op_fetch_agents(
     Dit is by design: fetching installeert de canonieke versie uit agent-services.
     Workspace-specifieke aanpassingen worden overschreven.
     """
+    # Policy gates
+    _policy_gate_workspace_paths(workspace_root)
+    
     # Valideer verplichte parameters
     if not value_stream:
         raise ValueError("Parameter --value-stream is verplicht voor fetch-agents operatie")
     
     value_stream = value_stream.lower()
     
-    _policy_gate_workspace_paths(workspace_root)
+    # Valideer dat fetch_agents.py bestaat
+    fetch_script = workspace_root / "scripts" / "fetch_agents.py"
+    if not fetch_script.exists():
+        raise PolicyError(
+            f"fetch_agents.py niet gevonden op verwachte locatie: {fetch_script.relative_to(workspace_root)}"
+        )
     
+    # Delegeer naar fetch_agents.py via subprocess
+    # Dit voorkomt duplicatie van de complexe manifest parsing logica
+    cmd = [
+        sys.executable,
+        str(fetch_script),
+        value_stream,
+        "--manifest", "agents-publicatie.json",
+        "--source-repo", agent_services_url,
+    ]
+    
+    # Voer fetch_agents.py uit vanuit workspace root
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=workspace_root,
+            capture_output=True,
+            text=True,
+            timeout=600  # 10 minuten timeout voor git clone + copy
+        )
+    except subprocess.TimeoutExpired:
+        raise PolicyError(
+            f"fetch_agents.py timed out na 10 minuten. "
+            f"Check netwerk verbinding of repository grootte."
+        )
+    
+    if result.returncode != 0:
+        # Parse error uit fetch_agents.py output
+        error_msg = result.stderr.strip() if result.stderr else result.stdout.strip()
+        raise PolicyError(
+            f"fetch_agents.py failed met exit code {result.returncode}\\n"
+            f"{error_msg}"
+        )
+    
+    # Parse artifacts uit fetch_agents.py output
+    # Zoek naar "Log: docs/logs/fetch-agents-*.md" in stdout
     artifacts: list[Path] = []
+    for line in result.stdout.splitlines():
+        if line.startswith("Log: "):
+            log_path = workspace_root / line.replace("Log: ", "").strip()
+            if log_path.exists():
+                artifacts.append(log_path)
     
-    # Maak temp directory voor clone
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_path = Path(temp_dir)
-        repo_path = temp_path / "agent-services"
-        
-        # Clone repository
-        try:
-            subprocess.run(
-                ["git", "clone", "--branch", branch, "--depth", "1", agent_services_url, str(repo_path)],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except subprocess.CalledProcessError as e:
-            raise PolicyError(
-                f"Kan agent-services repository niet clonen (branch: {branch}): {e.stderr}"
-            )
-        
-        # Lees agents-publicatie.json
-        manifest_path = repo_path / "agents-publicatie.json"
-        if not manifest_path.exists():
-            raise PolicyError(
-                f"agents-publicatie.json niet gevonden in repository root (branch: {branch})"
-            )
-        
-        with open(manifest_path, "r", encoding="utf-8") as f:
-            manifest = json.load(f)
-        
-        # Valideer value-stream bestaat
-        available_streams = manifest.get("valueStreams", [])
-        if value_stream not in available_streams:
-            raise PolicyError(
-                f"Value stream '{value_stream}' niet gevonden in publicatie. "
-                f"Beschikbare streams: {', '.join(available_streams)}"
-            )
-        
-        # Filter agents voor deze value stream
-        agents = manifest.get("agents", [])
-        filtered_agents = [a for a in agents if a.get("valueStream") == value_stream]
-        
-        if not filtered_agents:
-            return OperationResult(
-                success=True,
-                message=f"Geen agents gevonden voor value stream '{value_stream}'",
-                artifacts=[],
-            )
-        
-        # Installeer elke agent
-        installed_count = 0
-        prompts_count = 0
-        runners_count = 0
-        
-        for agent in filtered_agents:
-            agent_naam = agent.get("naam")
-            
-            # Charter
-            charter_src = repo_path / "exports" / value_stream / "charters-agents" / f"charter.{agent_naam}.md"
-            if charter_src.exists():
-                charter_dst = workspace_root / "charters-agents" / f"charter.{agent_naam}.md"
-                charter_dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(charter_src, charter_dst)
-                artifacts.append(charter_dst)
-            
-            # Prompts
-            prompts_src_dir = repo_path / "exports" / value_stream / "prompts"
-            if prompts_src_dir.exists():
-                for prompt_file in prompts_src_dir.glob(f"{agent_naam}-*.prompt.md"):
-                    prompt_dst = workspace_root / ".github" / "prompts" / prompt_file.name
-                    prompt_dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(prompt_file, prompt_dst)
-                    artifacts.append(prompt_dst)
-                    prompts_count += 1
-            
-            # Runners (optioneel)
-            if include_runners:
-            runner_found = False  # Track of deze agent een runner heeft
-            
-            # Standalone runner file
-            runner_src = repo_path / "exports" / value_stream / "runners" / f"{agent_naam}.py"
-            if runner_src.exists():
-                runner_dst = workspace_root / "scripts" / f"{agent_naam}.py"
-                runner_dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(runner_src, runner_dst)
-                artifacts.append(runner_dst)
-                runner_found = True
-            
-            # Runner module folder (indien aanwezig)
-            runner_module_src = repo_path / "exports" / value_stream / "runners" / agent_naam
-            if runner_module_src.exists() and runner_module_src.is_dir():
-                runner_module_dst = workspace_root / "scripts" / agent_naam
-                
-                # BELANGRIJK: Verwijder bestaande module VOLLEDIG (niet mergen!)
-                # Dit is by design - workspace krijgt de canonieke versie uit agent-services.
-                # Als workspace-folder 2 files heeft en agent-services 1 file,
-                # blijven na fetch alleen het 1 file uit agent-services over.
-                if runner_module_dst.exists():
-                    try:
-                        shutil.rmtree(runner_module_dst)
-                    except (PermissionError, OSError) as e:
-                        raise PolicyError(
-                            f"Kan bestaande runner module niet verwijderen: {runner_module_dst}\n"
-                            f"Fout: {e}\n"
-                            f"Tip: Sluit programma's die deze files gebruiken."
-                        )
-                
-                # Kopieer module
-                shutil.copytree(runner_module_src, runner_module_dst)
-                artifacts.append(runner_module_dst)
-                runner_found = True
-                
-                # Valideer module heeft __init__.py
-                init_file = runner_module_dst / "__init__.py"
-                if not init_file.exists():
-                    print(f"[WARNING] Runner module {agent_naam}/ heeft geen __init__.py", file=sys.stderr)
-            
-            # Tel als 1 runner (ongeacht file/module structuur)
-            if runner_found:
-                runners_count += 1
-        
-        # Genereer manifest
-        manifest_dst = workspace_root / "docs" / "agents-manifest.md"
-        manifest_dst.parent.mkdir(parents=True, exist_ok=True)
-        
-        manifest_lines = [
-            f"# Agents Manifest\n\n",
-            f"**Datum**: {datetime.now().strftime('%Y-%m-%d')}\n",
-            f"**Value Stream**: {value_stream}\n",
-            f"**Branch**: {branch}\n",
-            f"**Bron**: {agent_services_url}\n\n",
-            f"## Geïnstalleerde Agents ({installed_count})\n\n",
-        ]
-        
-        for agent in filtered_agents:
-            manifest_lines.append(f"- **{agent.get('naam')}**: {agent.get('aantalPrompts', 0)} prompts")
-            if include_runners and agent.get('aantalRunners', 0) > 0:
-                manifest_lines.append(f", {agent.get('aantalRunners')} runners")
-            manifest_lines.append("\n")
-        
-        manifest_lines.append(f"\n## Statistieken\n\n")
-        manifest_lines.append(f"- Agents: {installed_count}\n")
-        manifest_lines.append(f"- Prompts: {prompts_count}\n")
-        manifest_lines.append(f"- Runners: {runners_count}\n")
-        
-        manifest_dst.write_text("".join(manifest_lines), encoding="utf-8")
-        artifacts.append(manifest_dst)
-        
-        # Genereer fetch-log met timestamp
-        logs_dir = workspace_root / "docs" / "logs"
-        logs_dir.mkdir(parents=True, exist_ok=True)
-        
-        log_timestamp = datetime.now()
-        timestamp = log_timestamp.strftime("%Y%m%d-%H%M%S")
-        log_dst = logs_dir / f"fetch-agents-{timestamp}.md"
-        
-        log_lines = [
-            f"# Fetch Agents Log\n\n",
-            f"**Datum**: {log_timestamp.strftime('%Y-%m-%d')}\n",
-            f"**Tijd**: {log_timestamp.strftime('%H:%M:%S')}\n",
-            f"**Value Stream**: {value_stream}\n",
-            f"**Branch**: {branch}\n",
-            f"**Repository**: {agent_services_url}\n\n",
-            f"## Status\n\n",
-            f"✓ SUCCESS: {installed_count} agents geïnstalleerd\n\n",
-            f"## Geïnstalleerde Agents\n\n",
-        ]
-        
-        for agent in filtered_agents:
-            log_lines.append(
-                f"- **{agent.get('naam')}**: "
-                f"{agent.get('aantalPrompts', 0)} prompts"
-            )
-            if include_runners and agent.get('aantalRunners', 0) > 0:
-                log_lines.append(f", {agent.get('aantalRunners')} runners")
-            log_lines.append("\n")
-        
-        log_lines.append(f"\n## Totaal Statistieken\n\n")
-        log_lines.append(f"| Categorie | Aantal |\n")
-        log_lines.append(f"|-----------|--------|\n")
-        log_lines.append(f"| Agents | {installed_count} |\n")
-        log_lines.append(f"| Prompts | {prompts_count} |\n")
-        log_lines.append(f"| Runners | {runners_count} |\n")
-        log_lines.append(f"\n## Locaties\n\n")
-        log_lines.append(f"- Charters: `charters-agents/`\n")
-        log_lines.append(f"- Prompts: `.github/prompts/`\n")
-        log_lines.append(f"- Runners: `scripts/`\n")
-        log_lines.append(f"- Manifest: `docs/agents-manifest.md`\n")
-        
-        log_dst.write_text("".join(log_lines), encoding="utf-8")
-        artifacts.append(log_dst)
+    # Als geen log gevonden, zoek meest recente
+    logs_dir = workspace_root / "docs" / "logs"
+    if not artifacts and logs_dir.exists():
+        fetch_logs = sorted(logs_dir.glob("fetch-agents-*.md"), reverse=True)
+        if fetch_logs:
+            artifacts.append(fetch_logs[0])
     
-    message = (
-        f"Agents opgehaald: {installed_count} agents, {prompts_count} prompts, {runners_count} runners "
-        f"(value-stream: {value_stream}, branch: {branch})"
-    )
+    # Parse summary uit output
+    summary_lines = [line for line in result.stdout.splitlines() if "Agents applied:" in line or "Value-stream:" in line]
+    summary = " | ".join(summary_lines) if summary_lines else f"Agents opgehaald voor {value_stream}"
+    
+    message = f"Agents opgehaald via fetch_agents.py (branch: {branch}) - {summary}"
     
     return OperationResult(
         success=True,

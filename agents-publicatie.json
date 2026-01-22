@@ -1,17 +1,77 @@
 {
-  "publicatiedatum": "2026-01-18",
-  "versie": "1.0",
+  "publicatiedatum": "2026-01-22",
+  "versie": "1.1",
   "agents": [
+    {
+      "naam": "agent-curator",
+      "valueStream": "agent-enablement",
+      "aantalPrompts": 4,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "agent-smeder",
+      "valueStream": "agent-enablement",
+      "aantalPrompts": 3,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "moeder",
+      "valueStream": "agent-enablement",
+      "aantalPrompts": 6,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "archimate-modelleur",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 2,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "bedrijfsarchitect",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 0,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "c4-modelleur",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 2,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "converter-md-to-archimate",
+      "valueStream": "architectuur-en-oplossingsontwerp",
+      "aantalPrompts": 1,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "archimate-modeler",
+      "valueStream": "it-development",
+      "aantalPrompts": 0,
+      "aantalRunners": 0
+    },
+    {
+      "naam": "pipeline-executor",
+      "valueStream": "it-development",
+      "aantalPrompts": 0,
+      "aantalRunners": 1
+    },
+    {
+      "naam": "workflow-architect",
+      "valueStream": "it-development",
+      "aantalPrompts": 0,
+      "aantalRunners": 1
+    },
     {
       "naam": "agent-publisher",
       "valueStream": "kennispublicatie",
-      "aantalPrompts": 1,
+      "aantalPrompts": 0,
       "aantalRunners": 0
     },
     {
       "naam": "artikel-schrijver",
       "valueStream": "kennispublicatie",
-      "aantalPrompts": 6,
+      "aantalPrompts": 0,
       "aantalRunners": 0
     },
     {
@@ -23,50 +83,32 @@
     {
       "naam": "essayist",
       "valueStream": "kennispublicatie",
-      "aantalPrompts": 1,
+      "aantalPrompts": 0,
       "aantalRunners": 0
     },
     {
       "naam": "heraut",
       "valueStream": "kennispublicatie",
-      "aantalPrompts": 2,
+      "aantalPrompts": 0,
       "aantalRunners": 0
     },
     {
       "naam": "presentatie-architect",
       "valueStream": "kennispublicatie",
-      "aantalPrompts": 1,
+      "aantalPrompts": 0,
       "aantalRunners": 0
     },
     {
       "naam": "vertaler",
       "valueStream": "kennispublicatie",
-      "aantalPrompts": 1,
+      "aantalPrompts": 0,
       "aantalRunners": 0
-    },
-    {
-      "naam": "pipeline-executor",
-      "valueStream": "it-development",
-      "aantalPrompts": 1,
-      "aantalRunners": 1
-    },
-    {
-      "naam": "workflow-architect",
-      "valueStream": "it-development",
-      "aantalPrompts": 3,
-      "aantalRunners": 1
     },
     {
       "naam": "mandarin-ea",
       "valueStream": "ondernemingsvorming",
-      "aantalPrompts": 1,
+      "aantalPrompts": 0,
       "aantalRunners": 0
-    },
-    {
-      "naam": "moeder",
-      "valueStream": "utility",
-      "aantalPrompts": 6,
-      "aantalRunners": 1
     },
     {
       "naam": "python-expert",
@@ -76,14 +118,24 @@
     }
   ],
   "valueStreams": [
-    "kennispublicatie",
+    "agent-enablement",
+    "architectuur-en-oplossingsontwerp",
     "it-development",
+    "kennispublicatie",
     "ondernemingsvorming",
     "utility"
   ],
   "locaties": {
-    "charters": "exports/<value-stream>/charters-agents/charter.<agent-naam>.md",
-    "prompts": "exports/<value-stream>/prompts/<agent-naam>-<werkwoord>.prompt.md",
-    "runners": "exports/<value-stream>/runners/<agent-naam>.py"
+    "charters": {
+      "agent-enablement": "agent-charters/charter.<agent-naam>.md",
+      "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/charters/charter.<agent-naam>.md",
+      "default": "exports/<value-stream>/charters-agents/charter.<agent-naam>.md"
+    },
+    "prompts": {
+      "agent-enablement": ".github/prompts/<agent-naam>-<werkwoord>.prompt.md",
+      "architectuur-en-oplossingsontwerp": "exports/architectuur-en-oplossingsontwerp/prompts/<agent-naam>-<werkwoord>.prompt.md",
+      "default": "exports/<value-stream>/prompts/<agent-naam>-<werkwoord>.prompt.md"
+    },
+    "runners": "scripts/runners/<agent-naam>.py"
   }
 }

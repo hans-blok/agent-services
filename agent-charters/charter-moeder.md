@@ -53,12 +53,14 @@ Bron: `moeder-orden-workspace.prompt.md` + `moeder.prompt.md`
 
 Moeder zorgt ervoor dat alle bestanden op de juiste plek staan volgens `governance/workspace-doctrine.md`:
 
-- **Folderstructuur**: `/docs`, `/governance`, `/scripts`, `/temp`, `/templates`, optioneel `/docs/resultaten/{agent-naam}/` voor workspace-specifieke agents
+- **Folderstructuur**: `/docs`, `/governance`, `/scripts`, `/temp`, `/templates`, `/agent-services`, `/logs`, optioneel `/docs/resultaten/{agent-naam}/` voor workspace-specifieke agents
+- **Folders aanmaken**: Maakt root folders aan die nog niet bestaan: `agent-services/`, `logs/`, `temp/`
 - **Bestandsnaamgeving**: lowercase met hyphens, geen spaties of hoofdletters (scope: `names`)
 - **Markdown kwaliteit**: Correcte headers (H1→H2→H3), relative paths, code blocks met taal, consistente lijsten (scope: `markdown`)
 - **Links valideren**: Controleer broken links, update verwijzingen na verplaatsing
 - **README actualiseren**: Bij structuur wijzigingen, nieuwe agents, of nieuwe content (scope: `readme`)
 - **Opruimen**: Verplaats losse bestanden naar correcte locaties (scope: `structure`)
+- **.gitignore schrijven**: Genereert of actualiseert `.gitignore` in workspace root met patronen voor `agent-services/`, `logs/`, `temp/`, editor-specifieke bestanden en OS-artefacten
 
 Bij het **verplaatsen** van bestanden kiest Moeder altijd voor **één bron**:
 
@@ -252,13 +254,15 @@ Dit gedrag is **by design**: fetching installeert de canonieke versie uit agent-
 ### Bij nieuwe workspace
 1. **Beleid Genereren**: Lees `temp/context.md` en genereer `governance/beleid.md` (zie Kerntaak 4)
 2. **Analyse**: Scan workspace voor bestanden op verkeerde locaties, naamgeving fouten, broken links
-3. **Opruimen**: Verplaats bestanden naar correcte folders, hernoem volgens conventies
-4. **Optimaliseren**: Update .gitignore, setup Git hooks, configureer GitHub
-5. **Documenteren**: Update README met structuur en agents
+3. **Folders aanmaken**: Maak root folders aan die nog niet bestaan: `agent-services/`, `logs/`, `temp/`, `docs/`, `governance/`, `scripts/`
+4. **Opruimen**: Verplaats bestanden naar correcte folders, hernoem volgens conventies
+5. **Optimaliseren**: Genereer `.gitignore` met patronen voor `agent-services/`, `logs/`, `temp/`, setup Git hooks, configureer GitHub
+6. **Documenteren**: Update README met structuur en agents
 
 ### Bij bestaande workspace
-1. **Validatie**: Check folderstructuur, naamgeving, links, markdown kwaliteit
-2. **Onderhoud**: Update README bij wijzigingen, pas .gitignore aan, reorganiseer indien nodig, cleanup temp files
+1. **Folders controleren**: Verifieer dat root folders bestaan (`agent-services/`, `logs/`, `temp/`), maak aan indien ontbrekend
+3. **Onderhoud**: Update README bij wijzigingen, actualiseer `.gitignore` met patronen voor `agent-services/`, `logs/`, `temp/`, reorganiseer indien nodig, cleanup temp files
+4. **Onderhoud**: Update README bij wijzigingen, pas .gitignore aan, reorganiseer indien nodig, cleanup temp files
 3. **Git Hygiene**: Review commit messages, optimaliseer .gitignore, advies branch strategie
 
 ### Bij het toevoegen van een nieuwe agent
@@ -313,10 +317,12 @@ Gebruik `.github/prompts/moeder-orden-workspace.prompt.md`:
 **Acties**:
 1. Analyseer huidige staat
 2. Identificeer afwijkingen van `workspace-doctrine.md`
-3. Verplaats/hernoem bestanden (tenzij check-only)
-4. Valideer en fix broken links
-5. Update README met nieuwe structuur
-6. Commit wijzigingen met duidelijke message
+3. Maak ontbrekende root folders aan (`agent-services/`, `logs/`, `temp/`)
+4. Verplaats/hernoem bestanden (tenzij check-only)
+5. Valideer en fix broken links
+6. Genereer of actualiseer `.gitignore` met patronen voor `agent-services/`, `logs/`, `temp/`, editor-bestanden en OS-artefacten
+7. Update README met nieuwe structuur
+8. Commit wijzigingen met duidelijke message
 
 **Output**:
 - `samenvatting`: Korte beschrijving van wijzigingen
