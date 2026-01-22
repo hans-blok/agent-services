@@ -31,6 +31,7 @@ def _write_trace(
     success: bool,
     message: str,
     artifacts: list[Path],
+    value_stream: str | None = None,
 ) -> Path:
     temp_dir = workspace_root / "temp"
     temp_dir.mkdir(parents=True, exist_ok=True)
@@ -49,6 +50,8 @@ def _write_trace(
         lines.append(f"- doel: {doel}\n")
     if domein is not None:
         lines.append(f"- domein: {domein}\n")
+    if value_stream is not None:
+        lines.append(f"- value-stream: {value_stream}\n")
 
     lines.append("\n## Artifacts\n")
     if artifacts:
@@ -93,6 +96,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--doel", help="Wat de agent doet in één zin")
     parser.add_argument("--domein", help="Kennisgebied of specialisatie")
+    parser.add_argument(
+        "--value-stream",
+        help=(
+            "Primaire value stream voor plaatsing. In bronrepo's (AGENTS_SOURCE_REPO=true) "
+            "schrijft Smeder prompts naar exports/<value-stream>/prompts/."
+        ),
+    )
 
     parser.add_argument(
         "--no-trace",
@@ -115,6 +125,7 @@ def run_frontdoor(*, workspace_root: Path, argv: list[str] | None = None) -> Fro
             capability_boundary=args.capability_boundary,
             doel=args.doel,
             domein=args.domein,
+            value_stream=args.value_stream,
         )
 
         trace_path = None
@@ -126,6 +137,7 @@ def run_frontdoor(*, workspace_root: Path, argv: list[str] | None = None) -> Fro
                 capability_boundary=args.capability_boundary,
                 doel=args.doel,
                 domein=args.domein,
+                value_stream=args.value_stream,
                 success=result.success,
                 message=result.message,
                 artifacts=result.artifacts,
@@ -143,6 +155,7 @@ def run_frontdoor(*, workspace_root: Path, argv: list[str] | None = None) -> Fro
                 capability_boundary=args.capability_boundary,
                 doel=args.doel,
                 domein=args.domein,
+                value_stream=args.value_stream,
                 success=False,
                 message=str(exc),
                 artifacts=[],

@@ -26,6 +26,7 @@ import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -187,7 +188,7 @@ def _copy_file(src: Path, dest: Path) -> str:
         return "error"
 
 
-def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[Path], workspace: Path) -> Dict[str, int]:
+def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[Path], workspace: Path, repo_path: Path) -> Dict[str, int]:
     """Organize files into workspace. Runner modules are replaced entirely."""
     prompts_dir = workspace / ".github" / "prompts"
     charters_dir = workspace / "charters-agents"
@@ -251,6 +252,62 @@ def organize(vs_files: List[Path], util_files: List[Path], runner_modules: List[
         else:
             print(f"  [SKIP] {src}")
     return stats
+
+
+def write_fetch_log(workspace: Path, value_stream: str, meta: Dict[str, str], applicable: List[AgentSpec], stats: Dict[str, int], source_repo: str) -> Path:
+    """Write detailed fetch log to docs/logs/ folder."""
+    logs_dir = workspace / "docs" / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    
+    log_timestamp = datetime.now()
+    timestamp = log_timestamp.strftime("%Y%m%d-%H%M%S")
+    log_path = logs_dir / f"fetch-agents-{timestamp}.md"
+    
+    log_lines = [
+        f"# Fetch Agents Log\n\n",
+        f"**Datum**: {log_timestamp.strftime('%Y-%m-%d')}\n",
+        f"**Tijd**: {log_timestamp.strftime('%H:%M:%S')}\n",
+        f"**Value Stream**: {value_stream}\n",
+        f"**Repository**: {source_repo}\n",
+        f"**Manifest Versie**: {meta.get('version', 'unknown')}\n",
+        f"**Publicatiedatum**: {meta.get('published_at', 'unknown')}\n\n",
+        f"## Status\n\n",
+        f"✓ SUCCESS: {len(applicable)} agents gefetched\n\n",
+        f"## Gefetchte Agents\n\n",
+    ]
+    
+    for spec in applicable:
+        prompts = int(spec.metadata.get("aantalPrompts", "0"))
+        runners = int(spec.metadata.get("aantalRunners", "0"))
+        log_lines.append(f"- **{spec.name}** ({spec.agent_type}): {prompts} prompts")
+        if runners > 0:
+            log_lines.append(f", {runners} runners")
+        log_lines.append("\n")
+    
+    log_lines.append(f"\n## Bestandsoperaties\n\n")
+    log_lines.append(f"| Status | Aantal |\n")
+    log_lines.append(f"|--------|--------|\n")
+    log_lines.append(f"| Nieuw | {stats.get('new', 0)} |\n")
+    log_lines.append(f"| Bijgewerkt | {stats.get('updated', 0)} |\n")
+    log_lines.append(f"| Ongewijzigd | {stats.get('unchanged', 0)} |\n")
+    log_lines.append(f"| Runner modules vervangen | {stats.get('modules_replaced', 0)} |\n")
+    if stats.get('error', 0) > 0:
+        log_lines.append(f"| Fouten | {stats.get('error', 0)} |\n")
+    
+    log_lines.append(f"\n## Locaties\n\n")
+    log_lines.append(f"- Charters: `charters-agents/`\n")
+    log_lines.append(f"- Prompts: `.github/prompts/`\n")
+    log_lines.append(f"- Runners: `scripts/`\n")
+    log_lines.append(f"- Log: `{log_path.relative_to(workspace)}`\n")
+    
+    log_lines.append(f"\n## Overschrijfgedrag\n\n")
+    log_lines.append(f"⚠️  **Runner modules**: Volledig verwijderd en vervangen (niet gemerged!)\n")
+    log_lines.append(f"- Charters: Volledig overschreven met versie uit agent-services\n")
+    log_lines.append(f"- Prompts: Bestaande prompts met dezelfde naam overschreven\n\n")
+    log_lines.append(f"Dit gedrag is by design: fetching installeert de canonieke versie uit agent-services.\n")
+    
+    log_path.write_text("".join(log_lines), encoding="utf-8")
+    return log_path
 
 
 def sync_self_script(repo_path: Path, workspace: Path) -> str:
@@ -327,7 +384,10 @@ def main() -> int:
             print("[ERROR] No files resolved")
             return 1
 
-        stats = organize(vs_files, util_files, runner_modules, workspace)
+        stats = organize(vs_files, util_files, runner_modules, workspace, repo)
+        
+        # Write detailed log
+        log_path = write_fetch_log(workspace, value_stream, meta, applicable, stats, args.source_repo)
 
         # Sync this script from source of truth (agent-services)
         self_status = sync_self_script(repo, workspace)
@@ -345,6 +405,7 @@ def main() -> int:
             print(f"Runner modules replaced: {stats['modules_replaced']} (⚠️  old content removed)")
         if self_status != "missing":
             print(f"fetch_agents.py sync: {self_status}")
+        print(f"Log: {log_path.relative_to(workspace)}")
         print("[SUCCESS] Agents fetched")
         return 0
     except Exception as e:

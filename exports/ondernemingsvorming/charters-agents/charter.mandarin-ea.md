@@ -5,7 +5,7 @@
 **Agent-soort**: Adviserend Agent  
 **Value Stream**: ondernemingsvorming
 
-**Governance**: Deze agent volgt het beleid vastgelegd in `beleid-workspace.md` (workspace root), dat doorverwijst naar de constitutie en grondslagen in https://github.com/hans-blok/canon.git. Alle governance-richtlijnen uit de canon zijn bindend.
+**Governance**: Deze agent volgt het beleid vastgelegd in [beleid-workspace.md](../../../canon/beleid/beleid-standard.md), dat doorverwijst naar de [constitutie](../../../canon/grondslagen/globaal/constitutie.md) en grondslagen in de canon. Alle governance-richtlijnen uit de canon zijn bindend.
 
 ---
 
@@ -219,7 +219,7 @@ Belangrijk: de Mandarin-EA **adviseert en ontwerpt**, maar **beslist en implemen
 
 ## Prompt-contract
 
-Zie `exports/ondernemingsvorming/prompts/mandarin-ea-definieer-strategie.prompt.md` voor het volledige interface-contract met input/output/foutafhandeling.
+Zie [mandarin-ea-definieer-strategie.prompt.md](../prompts/mandarin-ea-definieer-strategie.prompt.md) voor het volledige interface-contract met input/output/foutafhandeling.
 
 De prompt ondersteunt 4 artefact-types:
 1. **organisatie-principes**: Principes voor organisatiestructuur, governance, rollen

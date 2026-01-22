@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Iterable, List, Optional
 
@@ -62,6 +63,35 @@ def _write_if_missing(path: Path, content: str) -> bool:
     return True
 
 
+def _is_source_repo(workspace_root: Path) -> bool:
+    env = os.getenv("AGENTS_SOURCE_REPO", "").strip().lower()
+    if env in ("1", "true", "yes"):  # explicit opt-in
+        return True
+    # Heuristic: repository named 'agent-services' acts as source repo by default
+    return workspace_root.name.lower() == "agent-services"
+
+
+def _prompt_target_path(
+    *, workspace_root: Path, agent_name: str, value_stream: Optional[str] | None
+) -> Path:
+    """Resolve prompt destination path based on repository mode.
+
+    - In source repos (AGENTS_SOURCE_REPO=true or repo name == agent-services):
+      exports/<value-stream>/prompts/<agent-name>.prompt.md (if value_stream provided)
+      else fallback to .github/prompts.
+    - In project workspaces (default): .github/prompts.
+    """
+    if _is_source_repo(workspace_root) and value_stream:
+        return (
+            workspace_root
+            / "exports"
+            / value_stream
+            / "prompts"
+            / f"{agent_name}.prompt.md"
+        )
+    return workspace_root / ".github" / "prompts" / f"{agent_name}.prompt.md"
+
+
 def op_init_skeleton(
     *,
     workspace_root: Path,
@@ -69,14 +99,15 @@ def op_init_skeleton(
     capability_boundary: str,
     doel: str,
     domein: str,
+    value_stream: Optional[str] | None = None,
 ) -> OperationResult:
     _policy_gate_common(agent_name=agent_name, capability_boundary=capability_boundary)
 
     artifacts: List[Path] = []
 
     role_path = workspace_root / "governance" / "rolbeschrijvingen" / f"{agent_name}.md"
-    prompt_path = (
-        workspace_root / ".github" / "prompts" / f"{agent_name}.prompt.md"
+    prompt_path = _prompt_target_path(
+        workspace_root=workspace_root, agent_name=agent_name, value_stream=value_stream
     )
     runner_path = workspace_root / "scripts" / f"{agent_name}.py"
 
@@ -172,10 +203,13 @@ def op_design_prompt_contract(
     capability_boundary: str,
     doel: str,
     domein: str,
+    value_stream: Optional[str] | None = None,
 ) -> OperationResult:
     _policy_gate_common(agent_name=agent_name, capability_boundary=capability_boundary)
 
-    prompt_path = workspace_root / ".github" / "prompts" / f"{agent_name}.prompt.md"
+    prompt_path = _prompt_target_path(
+        workspace_root=workspace_root, agent_name=agent_name, value_stream=value_stream
+    )
 
     content = (
         "---\n"
@@ -313,6 +347,7 @@ def execute_operation(
     capability_boundary: str,
     doel: str | None = None,
     domein: str | None = None,
+    value_stream: str | None = None,
 ) -> OperationResult:
     op = operation.strip().lower()
 
@@ -325,6 +360,7 @@ def execute_operation(
             capability_boundary=capability_boundary,
             doel=doel,
             domein=domein,
+            value_stream=value_stream,
         )
 
     if op == "design-prompt":
@@ -343,6 +379,7 @@ def execute_operation(
             capability_boundary=capability_boundary,
             doel=doel,
             domein=domein,
+            value_stream=value_stream,
         )
 
     if op == "write-role":
